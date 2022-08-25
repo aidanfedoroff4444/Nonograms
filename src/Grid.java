@@ -74,7 +74,7 @@ public class Grid {
     private void initializeClues() {
         if(useDefault) {
             maxNumOfColumnClues = 2;
-            maxNumOfRowClues = 2;
+            maxNumOfRowClues = 1;
         } else {
             System.out.println("Maximum number of clues for the clues in the columns: ");
             maxNumOfColumnClues = sc.nextInt();
@@ -89,6 +89,8 @@ public class Grid {
         height = puzzleHeight + maxNumOfColumnClues;
 
         if(useDefault) {
+            /* 10 x 10
+            // P
             columnClues = new int[][]{
                     {1, 0},
                     {1,0},
@@ -113,6 +115,7 @@ public class Grid {
                     {2,0},
                     {4,0}
             };
+            // Random Testing
             columnClues = new int[][]{
                     {10,0},
                     {1,0},
@@ -123,19 +126,34 @@ public class Grid {
                     {1,0},
                     {1,0},
                     {1,0},
-                    {1,0}
+                    {10,0}
             };
             rowClues = new int[][] {
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {4 ,0},
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {1,0}
+                    {1,1},
+                    {1,1},
+                    {1,1},
+                    {4,1},
+                    {1,1},
+                    {1,1},
+                    {1,1},
+                    {1,1},
+                    {4,1},
+                    {1,1}
+            };
+             */
+            columnClues = new int[][]{
+                    {3,0},
+                    {1,1},
+                    {1,3},
+                    {2,0},
+                    {2,0}
+            };
+            rowClues = new int[][]{
+                    {3},
+                    {1},
+                    {3},
+                    {3},
+                    {3}
             };
         } else {
             for(int i = 0; i < puzzleWidth; i++) {
@@ -271,20 +289,23 @@ public class Grid {
         g.setStroke(new BasicStroke(1));
         g.setFont(font);
         // Print the columnClues
-        System.out.println("columnClues: " + columnClues.length * columnClues[0].length);
+        // System.out.println("columnClues: " + columnClues.length * columnClues[0].length);
         for(int i = 0; i < columnClues.length; i++) {
-            for(int j = 0; j < columnClues[i].length; j++) {
-                int clueValue = columnClues[i][columnClues[i].length - j - 1];
+            for(int j = 0; j < nonZerosInArray(columnClues[i]); j++) {
+                // int clueValue = columnClues[i][columnClues[i].length - j - 1];
+                int clueValue = columnClues[i][j];
                 if( clueValue == 0 ) continue;
                 String clueText = String.valueOf(clueValue);
                 int x1 = gridOriginX + boxSize * (maxNumOfRowClues + i) + boxSize/2;
-                int y1 = gridOriginY + boxSize * j + boxSize/2;
+                int y1;
+                if( columnClues[i].length != nonZerosInArray(columnClues[i]) ) y1 = gridOriginY + boxSize * j + boxSize/2 - (columnClues[i].length - nonZerosInArray(columnClues[i]) * boxSize);
+                else y1 = gridOriginY + boxSize * j + boxSize/2;
 
                 drawStringFromCenter(clueText, x1, y1, g);
             }
         }
         // Print the rowClues
-        System.out.println("rowClues: " + rowClues.length * rowClues[0].length);
+        // System.out.println("rowClues: " + rowClues.length * rowClues[0].length);
         for(int i = 0; i < rowClues.length; i++) {
             for(int j = 0; j < rowClues[i].length; j++) {
                 int clueValue = rowClues[i][rowClues[i].length - j - 1];
@@ -296,6 +317,12 @@ public class Grid {
                 drawStringFromCenter(clueText, x1, y1, g);
             }
         }
+    }
+
+    public int nonZerosInArray(int[] arr) {
+        int out = 0;
+        for( int n : arr ) if ( n != 0 ) out++;
+        return out;
     }
 
     private void drawStringFromCenter(@NotNull String str, int x1, int y1, Graphics2D g) {
@@ -316,8 +343,30 @@ public class Grid {
         puzzle = new int[puzzleHeight][puzzleWidth];
 
         /*
-         * Check for empty rows and columns
+         * Input whatever fits in the full length of the row or column
+         *
+         * clue + space + clue = total
+         * width/height - total = takeaway
+         *
+         * output the 2's:
+         * skip takeaway + (clue - takeaway) + space + takeaway + (clue - takeaway)
          */
+        // Rows
+        for( int i = 0; i < puzzleHeight; i++ ) {
+            int nonZeroClues = nonZerosInArray(rowClues[i]);
+            if( nonZeroClues != 0 ) {
+                int total = 0;
+                for( int j = 0; j < rowClues[i].length; j++) total += rowClues[i][j];
+                total += nonZeroClues - 1;
+                int takeaway = puzzleWidth - total;
+            }
+            for( int j = 0; j < puzzleWidth; j++ ) {
+
+            }
+        }
+
+        /*
+         * Check for empty rows and columns
         // Rows
         for( int i = 0; i < puzzleHeight; i++ ) {
             if( rowClues[i][0] == 0 ) {
@@ -332,7 +381,6 @@ public class Grid {
         }
         /*
          * Check for full rows and columns
-         */
         // Rows
         for( int i = 0; i < puzzleHeight; i++ ) {
             if( rowClues[i][0] == puzzleWidth ) {
@@ -345,6 +393,7 @@ public class Grid {
                 for( int j = 0; j < puzzleHeight; j++ ) puzzle[j][i] = 2;
             }
         }
+        */
         /*
          * extends groups away from the wall they are touching
          * Ex: 4 [1,0,0,0,0,0,0,0,0,0] =>
@@ -360,16 +409,20 @@ public class Grid {
          * Check if there is a filled box next to the further side of the wall(last box in row or column)
          * Check from the back of the clues for the first clue that is not a 0
          * Extend the group outward from the wall  by (clue - 1)
-         */
          // Rows
         for( int i = 0; i < puzzleHeight; i++ ) {
             if( puzzle[i][0] == 2 ) {
-                int firstClue = rowClues[i][0];
-                for(int j = 1; j < firstClue; j++) {
+                for(int j = 1; j < rowClues[i][0]; j++) {
                     puzzle[i][j] = 2;
                 }
             }
+            if( puzzle[i][puzzleWidth - 1] == 2 ) {
+                for(int j = 1; j < rowClues[i][0]; j++ ) {
+                    puzzle[i][puzzleWidth - j - 1] = 2;
+                }
+            }
         }
+         */
 
 
         print2DIntArray(puzzle);

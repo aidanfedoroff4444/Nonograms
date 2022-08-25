@@ -18,7 +18,7 @@ public class Main {
         frame.setBounds(0, 0, width, height);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(3);
-        Grid myGrid = new Grid(width, height - 30, 10,10, 20);
+        Grid myGrid = new Grid(width, height - 30, 5,5, 20);
         JPanel panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
