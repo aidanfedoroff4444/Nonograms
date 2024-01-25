@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -252,8 +253,6 @@ public class Nonogram {
             if(puzzle[puzzleX][puzzleY] == 0) puzzle[puzzleX][puzzleY] = 2;
             else puzzle[puzzleX][puzzleY]--;
         }
-
-        checkPuzzle();
     }
 
     private boolean isInPuzzle(int x, int y) {
@@ -399,16 +398,80 @@ public class Nonogram {
 
     /*
         Check the puzzle. Output to the console:
+         - if there is at least one empty square. Print "Unfinished Puzzle"
          - if there is at least one error. Print that there are errors
          - if there are no errors. Print the number of squares still empty
          - if there are no squares empty. Print that the puzzle is solved
      */
-    private void checkPuzzle() {
-        // Check each row for errors
-        for(int i = 0; i < puzzleHeight; i++) {
-            int[] row = puzzle[i];
-            System.out.println(Arrays.toString(row));
+    public void checkPuzzle() {
+        // Count the empty squares
+        int emptySquares = 0;
+        for(int i = 0; i < puzzleWidth; i++)
+            for(int j = 0; j < puzzleHeight; j++)
+                if(puzzle[i][j] == 0) emptySquares++;
+
+        // Print the # of empty squares and return, if the # of empty squares is greater than 0
+        if(emptySquares > 0) {
+            System.out.println("There are still " + emptySquares + " to go");
+            return;
         }
+
+        // Check each row for errors
+        boolean errorExists = false;
+        for(int i = 0; i < puzzleHeight; i++) {
+            ArrayList<Integer> groups = new ArrayList<>();
+            // Iterate through the squares in the row to find groups
+            int size = 0;
+            for(int j = 0; j < puzzleWidth; j++) {
+                if(puzzle[i][j] == 1) size++;
+                else if(size != 0 && puzzle[i][j] == 2 || puzzle[i][j] == 0) {
+                    groups.add(size);
+                    size = 0;
+                }
+            }
+
+            while (rowClues[i].length != groups.size()) {
+                groups.add(size);
+                size = 0;
+            }
+            // System.out.println("Groups[" + i + "]: " + groups);
+
+            // Compare the size of the groups ArrayList to the number of clues for the row
+            if(rowClues[i].length != groups.size()) errorExists = true;
+            // Compare the groups ArrayList to the rowClues[i] array element by element
+            for(int j = 0; j < rowClues[i].length; j++)
+                if(groups.get(j) != rowClues[i][j])
+                    errorExists = true;
+            // System.out.println("rowClues[i]: " + Arrays.toString(rowClues[i]) + " - groups: " + groups);
+        }
+
+        // Check each column for errors
+        for(int i = 0; i < puzzleWidth; i++) {
+            ArrayList<Integer> groups = new ArrayList<>();
+            // Iterate through the squares in the row to find groups
+            int size = 0;
+            for(int j = 0; j < puzzleHeight; j++) {
+                if(puzzle[j][i] == 1) size++;
+                else if(size != 0 && puzzle[j][i] == 2 || puzzle[j][i] == 0) {
+                    groups.add(size);
+                    size = 0;
+                }
+            }
+
+            while (columnClues[i].length != groups.size()) {
+                groups.add(size);
+                size = 0;
+            }
+
+            // Compare the size of the groups ArrayList to the number of clues for the column
+            if(columnClues[i].length != groups.size()) errorExists = true;
+            // Compare the groups ArrayList to the colClues[i] array element by element
+            for(int j = 0; j < columnClues[i].length; j++)
+                if(groups.get(j) != columnClues[i][j])
+                    errorExists = true;
+            // System.out.println("columnClues[i]: " + Arrays.toString(columnClues[i]) + " - groups: " + groups);
+        }
+        System.out.println("errorExists: " + errorExists);
     }
 
     private void solvePuzzle() {
