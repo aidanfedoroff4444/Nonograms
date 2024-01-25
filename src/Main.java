@@ -1,9 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class Main {
 
@@ -30,12 +27,12 @@ public class Main {
         f.setResizable(false);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Grid myGrid = new Grid(screenWidth, screenHeight - SCREENHEIGHTOFFSET, PUZZLEWIDTH, PUZZLEHEIGHT, MARGIN);
+        Nonogram myNonogram = new Nonogram(screenWidth, screenHeight - SCREENHEIGHTOFFSET, PUZZLEWIDTH, PUZZLEHEIGHT, MARGIN);
         JPanel panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
                 g2 = (Graphics2D) g;
-                myGrid.paint(g2);
+                myNonogram.paint(g2);
                 // myGrid.printDebug();
             }
         };
@@ -47,7 +44,7 @@ public class Main {
         f.getContentPane().addMouseListener(new ClickListener() {
             @Override
             public void mousePressed(MouseEvent e) {
-                myGrid.mousePressed(e);
+                myNonogram.mousePressed(e);
                 // Repaint the JFrame
                 f.repaint();
                 // myGrid.paint(g2);

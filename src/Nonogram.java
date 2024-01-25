@@ -5,9 +5,10 @@ import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import java.util.Scanner;
 
-public class Grid {
+public class Nonogram {
     private int[][] columnClues;
     private int[][] rowClues;
     private int[][] puzzle; // a 2d grid of values within the range 0-2 inclusive. 0 denotes empty, 1 denotes filled, 2 denotes not filled(the box has a dot)
@@ -30,7 +31,7 @@ public class Grid {
 
     private final boolean useDefault;
 
-    public Grid(int screenWidth, int screenHeight, int puzzleWidth, int puzzleHeight, int margin) {
+    public Nonogram(int screenWidth, int screenHeight, int puzzleWidth, int puzzleHeight, int margin) {
         FONTSIZEOFFSET = 8;
         puzzleColor = new Color(15,15,15);
 
@@ -48,46 +49,6 @@ public class Grid {
         initializeGrid();
         // printDebug();
         solvePuzzle();
-    }
-
-    public void mousePressed(@NotNull MouseEvent e) {
-        /*
-         System.out.println("(" + e.getX() + ", " + e.getY() + ")");
-         System.out.println("isInGrid(e.getX(), e.getY()): " + isInGrid(e.getX(), e.getY()));
-         System.out.println("isInPuzzle(e.getX(), e.getY()): " + isInPuzzle(e.getX(), e.getY()));
-         System.out.println("getPuzzleIndices(e.getX(), e.getY()): " + getPuzzleIndices(e.getX(), e.getY()));
-         System.out.println("e.getButton(): " + e.getButton());
-        */
-
-        if(!isInPuzzle(e.getX(), e.getY())) return;
-
-        Point puzzleIndeces = getPuzzleIndices(e.getX(), e.getY());
-        int puzzleX = (int) puzzleIndeces.getY();
-        int puzzleY = (int) puzzleIndeces.getX();
-
-        if(e.getButton() == MouseEvent.BUTTON1) {
-            puzzle[puzzleX][puzzleY] = (puzzle[puzzleX][puzzleY] + 1) % 3;
-        }
-        else if(e.getButton() == MouseEvent.BUTTON3) {
-            if(puzzle[puzzleX][puzzleY] == 0) puzzle[puzzleX][puzzleY] = 2;
-            else puzzle[puzzleX][puzzleY]--;
-        }
-    }
-
-    private boolean isInPuzzle(int x, int y) {
-        return x >= gridOriginX + maxNumOfRowClues * boxSize && y >= gridOriginY + maxNumOfColumnClues * boxSize && x <= gridOriginX + gridWidth && y <= gridOriginY + gridHeight;
-    }
-
-    private Point getPuzzleIndices(int x, int y) {
-        Point p = new Point();
-        for(int i = 0; i < puzzleWidth; i++){
-            for(int j = 0; j < puzzleHeight; j++) {
-                if(x > gridOriginX + boxSize * (i + maxNumOfRowClues) && y > gridOriginY + boxSize * (j + maxNumOfColumnClues) &&
-                   x <= gridOriginX + boxSize * (i + maxNumOfRowClues + 1) && y <= gridOriginY + boxSize * (j + maxNumOfColumnClues + 1))
-                    p = new Point(i, j);
-            }
-        }
-        return p;
     }
 
     private void initializeGrid() {
@@ -238,15 +199,12 @@ public class Grid {
 
     private void print2DIntArray(int[][] arr2D) {
         System.out.print("[");
-        for(int i = 0; i < arr2D.length; i++) {
-            System.out.print("[");
-            for(int j = 0; j < arr2D[i].length; j++) {
-                System.out.print(arr2D[i][j]);
-                if(j != arr2D[i].length - 1) System.out.print(", ");
-            }
-            System.out.print("]");
-            if(i != arr2D.length - 1) System.out.print(", ");
-            System.out.println();
+        for(int i = 0; i < puzzleHeight; i++) {
+            if(i == puzzleHeight - 1)
+                System.out.println(Arrays.toString(puzzle[i]) + "]");
+            else
+                System.out.println(Arrays.toString(puzzle[i]));
+
         }
     }
 
@@ -269,12 +227,77 @@ public class Grid {
         return fontSize;
     }
 
+    /* Receive clicks from the user and determine which square in the
+     * puzzle grid that the mouse has either left-clicked or right-clicked
+     */
+    public void mousePressed(@NotNull MouseEvent e) {
+        /*
+         System.out.println("(" + e.getX() + ", " + e.getY() + ")");
+         System.out.println("isInGrid(e.getX(), e.getY()): " + isInGrid(e.getX(), e.getY()));
+         System.out.println("isInPuzzle(e.getX(), e.getY()): " + isInPuzzle(e.getX(), e.getY()));
+         System.out.println("getPuzzleIndices(e.getX(), e.getY()): " + getPuzzleIndices(e.getX(), e.getY()));
+         System.out.println("e.getButton(): " + e.getButton());
+        */
+
+        if(!isInPuzzle(e.getX(), e.getY())) return;
+
+        Point puzzleIndeces = getPuzzleIndices(e.getX(), e.getY());
+        int puzzleX = (int) puzzleIndeces.getY();
+        int puzzleY = (int) puzzleIndeces.getX();
+
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            puzzle[puzzleX][puzzleY] = (puzzle[puzzleX][puzzleY] + 1) % 3;
+        }
+        else if(e.getButton() == MouseEvent.BUTTON3) {
+            if(puzzle[puzzleX][puzzleY] == 0) puzzle[puzzleX][puzzleY] = 2;
+            else puzzle[puzzleX][puzzleY]--;
+        }
+
+        checkPuzzle();
+    }
+
+    private boolean isInPuzzle(int x, int y) {
+        return x >= gridOriginX + maxNumOfRowClues * boxSize && y >= gridOriginY + maxNumOfColumnClues * boxSize && x <= gridOriginX + gridWidth && y <= gridOriginY + gridHeight;
+    }
+
+    private Point getPuzzleIndices(int x, int y) {
+        Point p = new Point();
+        for(int i = 0; i < puzzleWidth; i++){
+            for(int j = 0; j < puzzleHeight; j++) {
+                if(x > gridOriginX + boxSize * (i + maxNumOfRowClues) && y > gridOriginY + boxSize * (j + maxNumOfColumnClues) &&
+                        x <= gridOriginX + boxSize * (i + maxNumOfRowClues + 1) && y <= gridOriginY + boxSize * (j + maxNumOfColumnClues + 1))
+                    p = new Point(i, j);
+            }
+        }
+        return p;
+    }
+
+    /*
+     * Draw the puzzle squares with their corresponding symbol
+     */
+    private void drawPuzzle(Graphics2D g) {
+        // Set the initial variables
+        g.setColor(puzzleColor);
+        int puzzleOriginX = gridOriginX + maxNumOfRowClues * boxSize;
+        int puzzleOriginY = gridOriginY + maxNumOfColumnClues * boxSize;
+        int circleSize = boxSize/5;
+
+        // Loop through each square in the puzzle grid
+        for(int i = 0; i < puzzle.length; i++) { // Row
+            int y = puzzleOriginY + boxSize * i; //  Get the y coordinate of the box
+            for(int j = 0; j < puzzle[0].length; j++) { // Column
+                int x = puzzleOriginX + boxSize * j; //  Get the x coordinate of the box
+                if( puzzle[i][j] == 1 ) g.fillRect(x, y, boxSize, boxSize); // Fill the square
+                if( puzzle[i][j] == 2 ) g.fillOval(x + boxSize/2 - circleSize/2, y + boxSize/2 - circleSize/2, circleSize, circleSize); // Fill the square with a dot
+            }
+        }
+        g.setColor(Color.black);
+    }
+
     public void paint(@NotNull Graphics2D g) {
         drawPuzzle(g);
 
-        /*
-         * Draw the light grey background for the clues
-         */
+        // Draw the light grey background for the clues
         g.setColor(Color.lightGray);
         g.fillRect(gridOriginX + (boxSize * maxNumOfRowClues),
                 gridOriginY,
@@ -286,15 +309,12 @@ public class Grid {
                 gridHeight - (boxSize * maxNumOfColumnClues));
         g.setColor(Color.black);
 
-        /*
-         * Draw outline of the grid
-         */
+        // Draw outline of the grid
+        g.setStroke(new BasicStroke(4));
         g.drawRect(gridOriginX, gridOriginY, gridWidth, gridHeight);
+        g.setStroke(new BasicStroke());
 
-        /*
-         * Draw the lines for the grid
-         */
-        // Vertical Lines:
+        // Draw the vertical lines for the grid:
         for(int i = 1; i <= width - 1; i++) {
             g.setStroke(new BasicStroke(2));
             int x1 = gridOriginX + boxSize * i;
@@ -308,7 +328,8 @@ public class Grid {
             if(i > maxNumOfRowClues && (i - maxNumOfRowClues) % 5 == 0) g.setStroke(new BasicStroke(3));
             g.drawLine(x1, y1, x2, y2);
         }
-        // Horizontal Lines:
+
+        // Draw the horizontal lines for the grid:
         for(int i = 1; i <= height - 1; i++) {
             g.setStroke(new BasicStroke(2));
             int x1 = gridOriginX;
@@ -324,13 +345,9 @@ public class Grid {
             g.drawLine(x1, y1, x2, y2);
         }
 
-        /*
-         * Draw the clue numbers
-         */
+        // Print the column clues
         g.setStroke(new BasicStroke(1));
         g.setFont(font);
-        // Print the columnClues
-        // System.out.println("columnClues: " + columnClues.length * columnClues[0].length);
         for(int i = 0; i < columnClues.length; i++) {
             for(int j = 0; j < nonZerosInArray(columnClues[i]); j++) {
                 // int clueValue = columnClues[i][columnClues[i].length - j - 1];
@@ -345,8 +362,8 @@ public class Grid {
                 drawStringFromCenter(clueText, x1, y1, g);
             }
         }
-        // Print the rowClues
-        // System.out.println("rowClues: " + rowClues.length * rowClues[0].length);
+
+        // Print the row clues
         for(int i = 0; i < rowClues.length; i++) {
             for(int j = 0; j < rowClues[i].length; j++) {
                 int clueValue = rowClues[i][rowClues[i].length - j - 1];
@@ -378,6 +395,20 @@ public class Grid {
         y1 = (int)(y1 + Math.abs(fmBounds.getY()) * 2/5 );
 
         g.drawString(str, x1, y1);
+    }
+
+    /*
+        Check the puzzle. Output to the console:
+         - if there is at least one error. Print that there are errors
+         - if there are no errors. Print the number of squares still empty
+         - if there are no squares empty. Print that the puzzle is solved
+     */
+    private void checkPuzzle() {
+        // Check each row for errors
+        for(int i = 0; i < puzzleHeight; i++) {
+            int[] row = puzzle[i];
+            System.out.println(Arrays.toString(row));
+        }
     }
 
     private void solvePuzzle() {
@@ -465,23 +496,5 @@ public class Grid {
 
 
         // print2DIntArray(puzzle);
-    }
-
-    private void drawPuzzle(Graphics2D g) {
-        g.setColor(puzzleColor);
-        int puzzleOriginX = gridOriginX + maxNumOfRowClues * boxSize;
-        int puzzleOriginY = gridOriginY + maxNumOfColumnClues * boxSize;
-        int x1, y1;
-        int circleSize = boxSize/5;
-
-        for(int i = 0; i < puzzle.length; i++) { // Row
-            y1 = puzzleOriginY + boxSize * i;
-            for(int j = 0; j < puzzle[0].length; j++) { // Column
-                x1 = puzzleOriginX + boxSize * j;
-                if( puzzle[i][j] == 1 ) g.fillRect(x1, y1, boxSize, boxSize);
-                if( puzzle[i][j] == 2 ) g.fillOval(x1 + boxSize/2 - circleSize/2, y1 + boxSize/2 - circleSize/2, circleSize, circleSize);
-            }
-        }
-        g.setColor(Color.black);
     }
 }
