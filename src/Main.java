@@ -11,11 +11,10 @@ public class Main {
     private static final int PUZZLEHEIGHT = 5;
     private static final int MARGIN = 20;
     private static final int SCREENHEIGHTOFFSET = 30;
+    private static Graphics2D g2;
     public static void main(String... args) {
         // Create a JFrame instance
         JFrame f = new JFrame();
-        // Add a listener for the user's mouse
-        f.getContentPane().addMouseListener(new ClickListener());
 
         // Get the local screen size
         Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
@@ -35,11 +34,25 @@ public class Main {
         JPanel panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g;
+                g2 = (Graphics2D) g;
                 myGrid.paint(g2);
+                // myGrid.printDebug();
             }
         };
+
+        // Add the JPanel to the JFrame
         f.add(panel);
+
+        // Add a listener for the user's mouse
+        f.getContentPane().addMouseListener(new ClickListener() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                myGrid.mousePressed(e);
+                // Repaint the JFrame
+                f.repaint();
+                // myGrid.paint(g2);
+            }
+        });
         f.setVisible(true);
     }
 }

@@ -1,6 +1,7 @@
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -9,7 +10,7 @@ import java.util.Scanner;
 public class Grid {
     private int[][] columnClues;
     private int[][] rowClues;
-    private int[][] puzzle; // 2's, 1's, and 0's. 2 is filled, 1 is not filled(the box has an x), 0 is empty
+    private int[][] puzzle; // a 2d grid of values within the range 0-2 inclusive. 0 denotes empty, 1 denotes filled, 2 denotes not filled(the box has a dot)
 
     private final Scanner sc;
 
@@ -49,6 +50,46 @@ public class Grid {
         solvePuzzle();
     }
 
+    public void mousePressed(@NotNull MouseEvent e) {
+        /*
+         System.out.println("(" + e.getX() + ", " + e.getY() + ")");
+         System.out.println("isInGrid(e.getX(), e.getY()): " + isInGrid(e.getX(), e.getY()));
+         System.out.println("isInPuzzle(e.getX(), e.getY()): " + isInPuzzle(e.getX(), e.getY()));
+         System.out.println("getPuzzleIndices(e.getX(), e.getY()): " + getPuzzleIndices(e.getX(), e.getY()));
+         System.out.println("e.getButton(): " + e.getButton());
+        */
+
+        if(!isInPuzzle(e.getX(), e.getY())) return;
+
+        Point puzzleIndeces = getPuzzleIndices(e.getX(), e.getY());
+        int puzzleX = (int) puzzleIndeces.getY();
+        int puzzleY = (int) puzzleIndeces.getX();
+
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            puzzle[puzzleX][puzzleY] = (puzzle[puzzleX][puzzleY] + 1) % 3;
+        }
+        else if(e.getButton() == MouseEvent.BUTTON3) {
+            if(puzzle[puzzleX][puzzleY] == 0) puzzle[puzzleX][puzzleY] = 2;
+            else puzzle[puzzleX][puzzleY]--;
+        }
+    }
+
+    private boolean isInPuzzle(int x, int y) {
+        return x >= gridOriginX + maxNumOfRowClues * boxSize && y >= gridOriginY + maxNumOfColumnClues * boxSize && x <= gridOriginX + gridWidth && y <= gridOriginY + gridHeight;
+    }
+
+    private Point getPuzzleIndices(int x, int y) {
+        Point p = new Point();
+        for(int i = 0; i < puzzleWidth; i++){
+            for(int j = 0; j < puzzleHeight; j++) {
+                if(x > gridOriginX + boxSize * (i + maxNumOfRowClues) && y > gridOriginY + boxSize * (j + maxNumOfColumnClues) &&
+                   x <= gridOriginX + boxSize * (i + maxNumOfRowClues + 1) && y <= gridOriginY + boxSize * (j + maxNumOfColumnClues + 1))
+                    p = new Point(i, j);
+            }
+        }
+        return p;
+    }
+
     private void initializeGrid() {
         initializeClues();
         // Get the dimensions for the grid
@@ -67,6 +108,8 @@ public class Grid {
         int fontWeight = Font.PLAIN;
         int fontSize = getMaximumFontSize(fontName, fontWeight);
         font = new Font(fontName, fontWeight, fontSize);
+
+        puzzle = new int[puzzleHeight][puzzleWidth];
     }
 
     private void initializeClues() {
@@ -169,7 +212,7 @@ public class Grid {
         }
     }
 
-    private void printDebug() {
+    public void printDebug() {
         System.out.println("puzzleWidth: " + puzzleWidth);
         System.out.println("puzzleHeight: " + puzzleHeight);
         System.out.println("screenWidth: " + screenWidth);
@@ -338,8 +381,6 @@ public class Grid {
     }
 
     private void solvePuzzle() {
-        puzzle = new int[puzzleHeight][puzzleWidth];
-
         /*
          * Input whatever fits in the full length of the row or column
          *
@@ -423,7 +464,7 @@ public class Grid {
          */
 
 
-        print2DIntArray(puzzle);
+        // print2DIntArray(puzzle);
     }
 
     private void drawPuzzle(Graphics2D g) {
@@ -437,8 +478,8 @@ public class Grid {
             y1 = puzzleOriginY + boxSize * i;
             for(int j = 0; j < puzzle[0].length; j++) { // Column
                 x1 = puzzleOriginX + boxSize * j;
-                if( puzzle[i][j] == 2 ) g.fillRect(x1, y1, boxSize, boxSize);
-                if( puzzle[i][j] == 1 ) g.fillOval(x1 + boxSize/2 - circleSize/2, y1 + boxSize/2 - circleSize/2, circleSize, circleSize);
+                if( puzzle[i][j] == 1 ) g.fillRect(x1, y1, boxSize, boxSize);
+                if( puzzle[i][j] == 2 ) g.fillOval(x1 + boxSize/2 - circleSize/2, y1 + boxSize/2 - circleSize/2, circleSize, circleSize);
             }
         }
         g.setColor(Color.black);
