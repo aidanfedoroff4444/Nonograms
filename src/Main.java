@@ -6,19 +6,32 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class Main {
+
+    private static final int PUZZLEWIDTH = 5;
+    private static final int PUZZLEHEIGHT = 5;
+    private static final int MARGIN = 20;
+    private static final int SCREENHEIGHTOFFSET = 30;
     public static void main(String... args) {
-        JFrame frame = new JFrame();
-        frame.getContentPane().addMouseListener(new ClickListener());
+        // Create a JFrame instance
+        JFrame f = new JFrame();
+        // Add a listener for the user's mouse
+        f.getContentPane().addMouseListener(new ClickListener());
 
+        // Get the local screen size
         Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = (int)(size.getWidth() * 1);
-        int height = (int)(size.getHeight() * 0.8);
-        System.out.println("Current Screen resolution : " + width + " by " + height);
+        // Set the size of the window using percentages
+        int screenWidth = (int)(size.getWidth() * 0.6);
+        int screenHeight = (int)(size.getHeight() * 0.8);
+        System.out.println("Current Screen resolution : " + screenWidth + " by " + screenHeight);
 
-        frame.setBounds(0, 0, width, height);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(3);
-        Grid myGrid = new Grid(width, height - 30, 5,5, 20);
+        // Set the bound and size of the window
+        f.setBounds(0, 0, screenWidth, screenHeight);
+        // Center the window on the screen
+        f.setLocationRelativeTo(null);
+        f.setResizable(false);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        Grid myGrid = new Grid(screenWidth, screenHeight - SCREENHEIGHTOFFSET, PUZZLEWIDTH, PUZZLEHEIGHT, MARGIN);
         JPanel panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
@@ -26,7 +39,7 @@ public class Main {
                 myGrid.paint(g2);
             }
         };
-        frame.add(panel);
-        frame.setVisible(true);
+        f.add(panel);
+        f.setVisible(true);
     }
 }

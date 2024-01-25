@@ -9,17 +9,15 @@ import java.util.Scanner;
 public class Grid {
     private int[][] columnClues;
     private int[][] rowClues;
-    private int[][] puzzle; // 2's, 1's, and 0's. 2 is filled, 1 is not filled, 0 is empty
+    private int[][] puzzle; // 2's, 1's, and 0's. 2 is filled, 1 is not filled(the box has an x), 0 is empty
 
     private final Scanner sc;
 
     // Styling
     private final Color puzzleColor;
-    private final int puzzleWidth;
-    private final int puzzleHeight;
+    private final int puzzleWidth, puzzleHeight;
     private int width, height;
-    private final int screenWidth;
-    private final int screenHeight;
+    private final int screenWidth, screenHeight;
     private int availableWidth, availableHeight;
     private int boxSize;
     private int gridWidth, gridHeight;
@@ -47,7 +45,7 @@ public class Grid {
         sc = new Scanner(System.in);
 
         initializeGrid();
-        printDebug();
+        // printDebug();
         solvePuzzle();
     }
 
