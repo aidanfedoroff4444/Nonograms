@@ -47,8 +47,6 @@ public class Main {
                 myNonogram.mousePressed(e);
                 // Repaint the JFrame
                 f.repaint();
-                // Check if the puzzle is correct
-                myNonogram.checkPuzzle();
             }
         });
         f.setVisible(true);

@@ -1,6 +1,7 @@
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.awt.Button;
 import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
@@ -21,19 +22,21 @@ public class Nonogram {
     private final int puzzleWidth, puzzleHeight;
     private int width, height;
     private final int screenWidth, screenHeight;
-    private int availableWidth, availableHeight;
-    private int boxSize;
+    private static int boxSize;
     private int gridWidth, gridHeight;
     private int gridOriginX, gridOriginY;
     private final int margin;
     private int maxNumOfColumnClues, maxNumOfRowClues;
     private Font font;
-    private final int FONTSIZEOFFSET;
+    private static final int FONTSIZEOFFSET = 8;
 
     private final boolean useDefault;
+    private final ArrayList<MyButton> buttons;
+
+    public static int getBoxSize() { return boxSize; }
+    public static int getFontSizeOffset() { return FONTSIZEOFFSET; }
 
     public Nonogram(int screenWidth, int screenHeight, int puzzleWidth, int puzzleHeight, int margin) {
-        FONTSIZEOFFSET = 8;
         puzzleColor = new Color(15,15,15);
 
         this.puzzleWidth = puzzleWidth;
@@ -48,23 +51,25 @@ public class Nonogram {
         sc = new Scanner(System.in);
 
         initializeGrid();
-        // printDebug();
-        solvePuzzle();
+
+        buttons = new ArrayList<MyButton>();
+        MyButton checkSolutionButton = new MyButton("Check Solution", 0, 0, 225, 54);
+        buttons.add(checkSolutionButton);
     }
 
     private void initializeGrid() {
         initializeClues();
         // Get the dimensions for the grid
-        availableWidth = screenWidth - (margin * 2);
-        availableHeight = screenHeight - (margin * 2);
+        int availableWidth = screenWidth - (margin * 2);
+        int availableHeight = screenHeight - (margin * 2);
 
         boxSize = Math.min(availableHeight / height, availableWidth / width);
 
         gridWidth = boxSize * width;
         gridHeight = boxSize * height;
 
-        gridOriginX = availableWidth/2 - gridWidth/2;
-        gridOriginY = availableHeight/2 - gridHeight/2 + margin;
+        gridOriginX = availableWidth /2 - gridWidth/2;
+        gridOriginY = availableHeight /2 - gridHeight/2 + margin;
 
         String fontName = "Arial";
         int fontWeight = Font.PLAIN;
@@ -92,58 +97,6 @@ public class Nonogram {
         height = puzzleHeight + maxNumOfColumnClues;
 
         if(useDefault) {
-            /* 10 x 10
-            // P
-            columnClues = new int[][]{
-                    {1, 0},
-                    {1,0},
-                    {10,0},
-                    {10,0},
-                    {2,2},
-                    {2,2},
-                    {2,1},
-                    {5,0},
-                    {3,0},
-                    {0,0}
-            };
-            rowClues = new int[][] {
-                    {5,0},
-                    {6,0},
-                    {2,2},
-                    {2,2},
-                    {2,2},
-                    {2,1},
-                    {5,0},
-                    {4,0},
-                    {2,0},
-                    {4,0}
-            };
-            // Random Testing
-            columnClues = new int[][]{
-                    {10,0},
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {1,0},
-                    {10,0}
-            };
-            rowClues = new int[][] {
-                    {1,1},
-                    {1,1},
-                    {1,1},
-                    {4,1},
-                    {1,1},
-                    {1,1},
-                    {1,1},
-                    {1,1},
-                    {4,1},
-                    {1,1}
-            };
-             */
             columnClues = new int[][]{
                     {3,0},
                     {1,1},
@@ -158,6 +111,101 @@ public class Nonogram {
                     {3},
                     {3}
             };
+            /*
+            columnClues = new int[][]{
+                    {},
+                    {},
+                    {2},
+                    {2},
+                    {3},
+                    {4},
+                    {5},
+                    {5},
+                    {3, 6, 6},
+                    {6, 11, 7},
+                    {3, 2, 13, 8},
+                    {3, 1, 2, 15, 9},
+                    {2, 1, 2, 16, 9},
+                    {2, 3, 13, 10},
+                    {2, 22, 10},
+                    {2, 26, 9},
+                    {3, 28, 9},
+                    {3, 31, 9},
+                    {4, 42},
+                    {17, 30},
+                    {13, 31},
+                    {9, 31},
+                    {29},
+                    {28},
+                    {9, 12},
+                    {7, 1, 2, 1},
+                    {5},
+                    {},
+                    {},
+                    {}
+            };
+            rowClues = new int[][]{
+                    {},
+                    {},
+                    {},
+                    {5},
+                    {7},
+                    {10},
+                    {13},
+                    {15},
+                    {17},
+                    {18},
+                    {20},
+                    {23},
+                    {7, 0, 0},
+                    {8},
+                    {8},
+                    {11},
+                    {12},
+                    {12},
+                    {14},
+                    {14},
+                    {15},
+                    {16},
+                    {16},
+                    {15},
+                    {16},
+                    {16},
+                    {16},
+                    {19},
+                    {19},
+                    {19},
+                    {18},
+                    {18},
+                    {16},
+                    {15},
+                    {12},
+                    {5, 0},
+                    {4, 0}, {1, 0},
+                    {4},
+                    {4},
+                    {0},
+                    {0},
+                    {0},
+                    {0},
+                    {0},
+                    {0},
+                    {0},
+                    {0},
+                    {0},
+                    {0},
+                    {0, 0},
+                    {0, 0},
+                    {0, 0, 0},
+                    {0, 0, 0},
+                    {0, 0},
+                    {0, 0},
+                    {0},
+                    {0},
+                    {},
+                    {}
+            };
+             */
         } else {
             for(int i = 0; i < puzzleWidth; i++) {
                 System.out.println("How many clues are in Column #" + (i+1) + ":");
@@ -171,41 +219,6 @@ public class Nonogram {
                 System.out.println("Enter clues for Row #" + (i+1) + ":");
                 for(int j = 0; j < numOfClues; j++) rowClues[i][j] = sc.nextInt();
             }
-        }
-    }
-
-    public void printDebug() {
-        System.out.println("puzzleWidth: " + puzzleWidth);
-        System.out.println("puzzleHeight: " + puzzleHeight);
-        System.out.println("screenWidth: " + screenWidth);
-        System.out.println("screenHeight: " + screenHeight);
-        System.out.println("margin: " + margin);
-
-        System.out.println("width: " + width);
-        System.out.println("height: " + height);
-
-        System.out.println("columnClues: ");
-        print2DIntArray(columnClues);
-        System.out.println("rowClues: ");
-        print2DIntArray(rowClues);
-
-        System.out.println("availableWidth: " + availableWidth);
-        System.out.println("availableHeight: " + availableHeight);
-        System.out.println("boxSize: " + boxSize);
-        System.out.println("gridWidth: " + gridWidth);
-        System.out.println("gridHeight: " + gridHeight);
-        System.out.println("gridOriginX: " + gridOriginX);
-        System.out.println("gridOriginY: " + gridOriginY);
-    }
-
-    private void print2DIntArray(int[][] arr2D) {
-        System.out.print("[");
-        for(int i = 0; i < puzzleHeight; i++) {
-            if(i == puzzleHeight - 1)
-                System.out.println(Arrays.toString(puzzle[i]) + "]");
-            else
-                System.out.println(Arrays.toString(puzzle[i]));
-
         }
     }
 
@@ -228,23 +241,32 @@ public class Nonogram {
         return fontSize;
     }
 
-    /* Receive clicks from the user and determine which square in the
-     * puzzle grid that the mouse has either left-clicked or right-clicked
+    /** Receive clicks from the user and determine which square in the
+     * puzzle grid that the mouse has either left-clicked or right-clicked and edits the square accordingly.
      */
     public void mousePressed(@NotNull MouseEvent e) {
-        /*
-         System.out.println("(" + e.getX() + ", " + e.getY() + ")");
-         System.out.println("isInGrid(e.getX(), e.getY()): " + isInGrid(e.getX(), e.getY()));
-         System.out.println("isInPuzzle(e.getX(), e.getY()): " + isInPuzzle(e.getX(), e.getY()));
-         System.out.println("getPuzzleIndices(e.getX(), e.getY()): " + getPuzzleIndices(e.getX(), e.getY()));
-         System.out.println("e.getButton(): " + e.getButton());
-        */
+        int x = e.getX();
+        int y = e.getY();
+
+        // Check each button to see if the click is on one of them. and if the click is on one of the buttons, run that buttons mousePressed function
+        for(int i = 0; i < buttons.size(); i++) {
+            MyButton button = buttons.get(i);
+            int buttonX = button.getPosition().x;
+            int buttonY = button.getPosition().y;
+            if(x > buttonX && x <= buttonX + button.getDimensions().width && y > buttonY && y <= buttonY + button.getDimensions().height) {
+                switch (button.mousePressed(e)) {
+                    case 0:
+                        checkFinishedPuzzle();
+                }
+            }
+        }
+
 
         if(!isInPuzzle(e.getX(), e.getY())) return;
 
-        Point puzzleIndeces = getPuzzleIndices(e.getX(), e.getY());
-        int puzzleX = (int) puzzleIndeces.getY();
-        int puzzleY = (int) puzzleIndeces.getX();
+        Point puzzleIndeces = getPuzzleIndices(x, y);
+        int puzzleX = (int) puzzleIndeces.y;
+        int puzzleY = (int) puzzleIndeces.x;
 
         if(e.getButton() == MouseEvent.BUTTON1) {
             puzzle[puzzleX][puzzleY] = (puzzle[puzzleX][puzzleY] + 1) % 3;
@@ -271,7 +293,7 @@ public class Nonogram {
         return p;
     }
 
-    /*
+    /**
      * Draw the puzzle squares with their corresponding symbol
      */
     private void drawPuzzle(Graphics2D g) {
@@ -349,9 +371,8 @@ public class Nonogram {
         g.setFont(font);
         for(int i = 0; i < columnClues.length; i++) {
             for(int j = 0; j < nonZerosInArray(columnClues[i]); j++) {
-                // int clueValue = columnClues[i][columnClues[i].length - j - 1];
                 int clueValue = columnClues[i][j];
-                if( clueValue == 0 ) continue;
+                if(clueValue == 0) continue;
                 String clueText = String.valueOf(clueValue);
                 int x1 = gridOriginX + boxSize * (maxNumOfRowClues + i) + boxSize/2;
                 int y1;
@@ -374,6 +395,9 @@ public class Nonogram {
                 drawStringFromCenter(clueText, x1, y1, g);
             }
         }
+
+        // Draw all the buttons
+        for(int i = 0; i < buttons.size(); i++) buttons.get(i).paint(g);
     }
 
     public int nonZerosInArray(int[] arr) {
@@ -403,7 +427,7 @@ public class Nonogram {
          - if there are no errors. Print the number of squares still empty
          - if there are no squares empty. Print that the puzzle is solved
      */
-    public void checkPuzzle() {
+    public void checkFinishedPuzzle() {
         // Count the empty squares
         int emptySquares = 0;
         for(int i = 0; i < puzzleWidth; i++)
@@ -411,10 +435,7 @@ public class Nonogram {
                 if(puzzle[i][j] == 0) emptySquares++;
 
         // Print the # of empty squares and return, if the # of empty squares is greater than 0
-        if(emptySquares > 0) {
-            System.out.println("There are still " + emptySquares + " to go");
-            return;
-        }
+        if(emptySquares > 0) return;
 
         // Check each row for errors
         boolean errorExists = false;
@@ -429,20 +450,20 @@ public class Nonogram {
                     size = 0;
                 }
             }
-
             while (rowClues[i].length != groups.size()) {
                 groups.add(size);
                 size = 0;
             }
-            // System.out.println("Groups[" + i + "]: " + groups);
 
             // Compare the size of the groups ArrayList to the number of clues for the row
             if(rowClues[i].length != groups.size()) errorExists = true;
             // Compare the groups ArrayList to the rowClues[i] array element by element
-            for(int j = 0; j < rowClues[i].length; j++)
-                if(groups.get(j) != rowClues[i][j])
+            for(int j = 0; j < rowClues[i].length; j++) {
+                if (groups.get(j) != rowClues[i][j]) {
                     errorExists = true;
-            // System.out.println("rowClues[i]: " + Arrays.toString(rowClues[i]) + " - groups: " + groups);
+                    break;
+                }
+            }
         }
 
         // Check each column for errors
@@ -457,7 +478,6 @@ public class Nonogram {
                     size = 0;
                 }
             }
-
             while (columnClues[i].length != groups.size()) {
                 groups.add(size);
                 size = 0;
@@ -466,98 +486,16 @@ public class Nonogram {
             // Compare the size of the groups ArrayList to the number of clues for the column
             if(columnClues[i].length != groups.size()) errorExists = true;
             // Compare the groups ArrayList to the colClues[i] array element by element
-            for(int j = 0; j < columnClues[i].length; j++)
-                if(groups.get(j) != columnClues[i][j])
+            for(int j = 0; j < columnClues[i].length; j++) {
+                if (groups.get(j) != columnClues[i][j]) {
                     errorExists = true;
-            // System.out.println("columnClues[i]: " + Arrays.toString(columnClues[i]) + " - groups: " + groups);
-        }
-        System.out.println("errorExists: " + errorExists);
-    }
-
-    private void solvePuzzle() {
-        /*
-         * Input whatever fits in the full length of the row or column
-         *
-         * clue + space + clue = total
-         * width/height - total = takeaway
-         *
-         * output the 2's:
-         * skip takeaway + (clue - takeaway) + space + takeaway + (clue - takeaway)
-         */
-        // Rows
-        for( int i = 0; i < puzzleHeight; i++ ) {
-            int nonZeroClues = nonZerosInArray(rowClues[i]);
-            if( nonZeroClues != 0 ) {
-                int total = 0;
-                for( int j = 0; j < rowClues[i].length; j++) total += rowClues[i][j];
-                total += nonZeroClues - 1;
-                int takeaway = puzzleWidth - total;
-            }
-            for( int j = 0; j < puzzleWidth; j++ ) {
-
-            }
-        }
-
-        /*
-         * Check for empty rows and columns
-        // Rows
-        for( int i = 0; i < puzzleHeight; i++ ) {
-            if( rowClues[i][0] == 0 ) {
-                for( int j = 0; j < puzzleWidth; j++ ) puzzle[i][j] = 1;
-            }
-        }
-        // Columns
-        for( int i = 0; i < puzzleWidth; i++ ) {
-            if( columnClues[i][0] == 0 ) {
-                for( int j = 0; j < puzzleHeight; j++ ) puzzle[j][i] = 1;
-            }
-        }
-        /*
-         * Check for full rows and columns
-        // Rows
-        for( int i = 0; i < puzzleHeight; i++ ) {
-            if( rowClues[i][0] == puzzleWidth ) {
-                for( int j = 0; j < puzzleWidth; j++ ) puzzle[i][j] = 2;
-            }
-        }
-        // Columns
-        for( int i = 0; i < puzzleWidth; i++ ) {
-            if( columnClues[i][0] == puzzleHeight ) {
-                for( int j = 0; j < puzzleHeight; j++ ) puzzle[j][i] = 2;
-            }
-        }
-        */
-        /*
-         * extends groups away from the wall they are touching
-         * Ex: 4 [1,0,0,0,0,0,0,0,0,0] =>
-         *     4 [1,1,1,1,0,0,0,0,0,0]
-         *
-         * Ex: 3 [0,0,0,0,0,0,0,0,0,1] =>
-         *     3 [0,0,0,0,0,0,0,1,1,1]
-         *
-         * Check if there is a filled box right next to the beginning wall(first box in row or column)
-         * Check the first clue
-         * Extend the group outward from the wall by (clue - 1)
-         *
-         * Check if there is a filled box next to the further side of the wall(last box in row or column)
-         * Check from the back of the clues for the first clue that is not a 0
-         * Extend the group outward from the wall  by (clue - 1)
-         // Rows
-        for( int i = 0; i < puzzleHeight; i++ ) {
-            if( puzzle[i][0] == 2 ) {
-                for(int j = 1; j < rowClues[i][0]; j++) {
-                    puzzle[i][j] = 2;
-                }
-            }
-            if( puzzle[i][puzzleWidth - 1] == 2 ) {
-                for(int j = 1; j < rowClues[i][0]; j++ ) {
-                    puzzle[i][puzzleWidth - j - 1] = 2;
+                    break;
                 }
             }
         }
-         */
-
-
-        // print2DIntArray(puzzle);
+        if(!errorExists) {
+            System.out.println("You Win!");
+            System.exit(0);
+        }
     }
 }
