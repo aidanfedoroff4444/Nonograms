@@ -27,7 +27,6 @@ public class MyButton extends Component {
      * The text of the button
      */
     private String text;
-    private final int FONTSIZE = 32;
 
     public MyButton() {
         this("Default MyButton", 0, 0, 100, 20);
@@ -39,13 +38,15 @@ public class MyButton extends Component {
     }
 
     public void paint(Graphics2D g) {
+        int fontSize = 32;
+
         Color tempColor = g.getColor();
 
         g.setColor(Color.lightGray);
         g.fillRect(0, 0, dimensions.width, dimensions.height);
         g.setColor(Color.black);
         g.drawRect(0, 0, dimensions.width, dimensions.height);
-        g.setFont(new Font("Arial", Font.PLAIN, FONTSIZE));
+        g.setFont(new Font("Arial", Font.PLAIN, fontSize));
         int greyscale = 50;
         g.setColor(new Color(greyscale, greyscale, greyscale));
         drawStringFromCenter(text, dimensions.width / 2, dimensions.height / 2, g);

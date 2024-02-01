@@ -19,7 +19,7 @@ public class Nonogram {
 
     // Styling
     private final Color puzzleColor;
-    private final int puzzleWidth, puzzleHeight;
+    private int puzzleWidth, puzzleHeight;
     private int width, height;
     private final int screenWidth, screenHeight;
     private static int boxSize;
@@ -30,29 +30,23 @@ public class Nonogram {
     private Font font;
     private static final int FONTSIZEOFFSET = 8;
 
-    private final boolean useDefault;
+    private final int useDefault;
     private final ArrayList<MyButton> buttons;
 
-    public static int getBoxSize() { return boxSize; }
-    public static int getFontSizeOffset() { return FONTSIZEOFFSET; }
-
-    public Nonogram(int screenWidth, int screenHeight, int puzzleWidth, int puzzleHeight, int margin) {
+    public Nonogram(int screenWidth, int screenHeight, int margin) {
         puzzleColor = new Color(15,15,15);
-
-        this.puzzleWidth = puzzleWidth;
-        this.puzzleHeight = puzzleHeight;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.margin = margin;
 
         // Ask for default grid
         // Test Variables
-        useDefault = true;
+        useDefault = 0;
         sc = new Scanner(System.in);
 
         initializeGrid();
 
-        buttons = new ArrayList<MyButton>();
+        buttons = new ArrayList<>();
         MyButton checkSolutionButton = new MyButton("Check Solution", 0, 0, 225, 54);
         buttons.add(checkSolutionButton);
     }
@@ -80,23 +74,10 @@ public class Nonogram {
     }
 
     private void initializeClues() {
-        if(useDefault) {
+
+        if(useDefault == 0) {
             maxNumOfColumnClues = 2;
             maxNumOfRowClues = 1;
-        } else {
-            System.out.println("Maximum number of clues for the clues in the columns: ");
-            maxNumOfColumnClues = sc.nextInt();
-            System.out.println("Maximum number of clues for the clues in the rows: ");
-            maxNumOfRowClues = sc.nextInt();
-        }
-
-        columnClues = new int[puzzleWidth][maxNumOfColumnClues];
-        rowClues = new int[puzzleHeight][maxNumOfRowClues];
-
-        width = puzzleWidth + maxNumOfRowClues;
-        height = puzzleHeight + maxNumOfColumnClues;
-
-        if(useDefault) {
             columnClues = new int[][]{
                     {3,0},
                     {1,1},
@@ -111,102 +92,51 @@ public class Nonogram {
                     {3},
                     {3}
             };
-            /*
+        } else if(useDefault == 1) {
+            maxNumOfColumnClues = 4;
+            maxNumOfRowClues = 4;
             columnClues = new int[][]{
-                    {},
-                    {},
-                    {2},
-                    {2},
-                    {3},
-                    {4},
-                    {5},
-                    {5},
-                    {3, 6, 6},
-                    {6, 11, 7},
-                    {3, 2, 13, 8},
-                    {3, 1, 2, 15, 9},
-                    {2, 1, 2, 16, 9},
-                    {2, 3, 13, 10},
-                    {2, 22, 10},
-                    {2, 26, 9},
-                    {3, 28, 9},
-                    {3, 31, 9},
-                    {4, 42},
-                    {17, 30},
-                    {13, 31},
-                    {9, 31},
-                    {29},
-                    {28},
-                    {9, 12},
-                    {7, 1, 2, 1},
-                    {5},
-                    {},
-                    {},
-                    {}
+                    {4,0,0,0},
+                    {3,2,0,0},
+                    {2,1,2,0},
+                    {8,0,0,0},
+                    {1,3,2,0},
+                    {2,8,0,0},
+                    {2,1,2,5},
+                    {3,4,2,0},
+                    {1,3,2,1},
+                    {3,1,2,1},
+                    {3,2,2,0},
+                    {5,0,0,0},
             };
             rowClues = new int[][]{
-                    {},
-                    {},
-                    {},
-                    {5},
-                    {7},
-                    {10},
-                    {13},
-                    {15},
-                    {17},
-                    {18},
-                    {20},
-                    {23},
-                    {7, 0, 0},
-                    {8},
-                    {8},
-                    {11},
-                    {12},
-                    {12},
-                    {14},
-                    {14},
-                    {15},
-                    {16},
-                    {16},
-                    {15},
-                    {16},
-                    {16},
-                    {16},
-                    {19},
-                    {19},
-                    {19},
-                    {18},
-                    {18},
-                    {16},
-                    {15},
-                    {12},
-                    {5, 0},
-                    {4, 0}, {1, 0},
-                    {4},
-                    {4},
-                    {0},
-                    {0},
-                    {0},
-                    {0},
-                    {0},
-                    {0},
-                    {0},
-                    {0},
-                    {0},
-                    {0},
-                    {0, 0},
-                    {0, 0},
-                    {0, 0, 0},
-                    {0, 0, 0},
-                    {0, 0},
-                    {0, 0},
-                    {0},
-                    {0},
-                    {},
-                    {}
+                    {5,0,0,0},
+                    {2,5,0,0},
+                    {4,1,2,0},
+                    {1,2,1,3},
+                    {6,1,1,0},
+                    {1,1,5,0},
+                    {1,5,0,0},
+                    {6,1,0,0},
+                    {2,1,1,0},
+                    {1,1,0,0},
+                    {1,2,0,0},
+                    {2,2,0,0},
+                    {1,2,0,0},
+                    {1,1,0,0},
+                    {1,1,0,0},
+                    {2,2,0,0},
+                    {5,0,0,0},
             };
-             */
         } else {
+            System.out.println("Maximum number of clues for the clues in the columns: ");
+            maxNumOfColumnClues = sc.nextInt();
+            System.out.println("Maximum number of clues for the clues in the rows: ");
+            maxNumOfRowClues = sc.nextInt();
+
+            columnClues = new int[puzzleWidth][maxNumOfColumnClues];
+            rowClues = new int[puzzleHeight][maxNumOfRowClues];
+
             for(int i = 0; i < puzzleWidth; i++) {
                 System.out.println("How many clues are in Column #" + (i+1) + ":");
                 int numOfClues = sc.nextInt();
@@ -220,6 +150,12 @@ public class Nonogram {
                 for(int j = 0; j < numOfClues; j++) rowClues[i][j] = sc.nextInt();
             }
         }
+
+        puzzleWidth = columnClues.length;
+        puzzleHeight = rowClues.length;
+
+        width = puzzleWidth + maxNumOfRowClues;
+        height = puzzleHeight + maxNumOfColumnClues;
     }
 
     private int getMaximumFontSize(String name, int weight) {
@@ -249,24 +185,19 @@ public class Nonogram {
         int y = e.getY();
 
         // Check each button to see if the click is on one of them. and if the click is on one of the buttons, run that buttons mousePressed function
-        for(int i = 0; i < buttons.size(); i++) {
-            MyButton button = buttons.get(i);
+        for (MyButton button : buttons) {
             int buttonX = button.getPosition().x;
             int buttonY = button.getPosition().y;
-            if(x > buttonX && x <= buttonX + button.getDimensions().width && y > buttonY && y <= buttonY + button.getDimensions().height) {
-                switch (button.mousePressed(e)) {
-                    case 0:
-                        checkFinishedPuzzle();
-                }
+            if (button.mousePressed(e) == 0 && x > buttonX && x <= buttonX + button.getDimensions().width && y > buttonY && y <= buttonY + button.getDimensions().height) {
+                checkFinishedPuzzle();
             }
         }
 
-
         if(!isInPuzzle(e.getX(), e.getY())) return;
 
-        Point puzzleIndeces = getPuzzleIndices(x, y);
-        int puzzleX = (int) puzzleIndeces.y;
-        int puzzleY = (int) puzzleIndeces.x;
+        Point puzzleIndices = getPuzzleIndices(x, y);
+        int puzzleX = (int) puzzleIndices.y;
+        int puzzleY = (int) puzzleIndices.x;
 
         if(e.getButton() == MouseEvent.BUTTON1) {
             puzzle[puzzleX][puzzleY] = (puzzle[puzzleX][puzzleY] + 1) % 3;
@@ -397,7 +328,7 @@ public class Nonogram {
         }
 
         // Draw all the buttons
-        for(int i = 0; i < buttons.size(); i++) buttons.get(i).paint(g);
+        for(MyButton button : buttons) button.paint(g);
     }
 
     public int nonZerosInArray(int[] arr) {

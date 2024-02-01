@@ -4,8 +4,6 @@ import java.awt.event.MouseEvent;
 
 public class Main {
 
-    private static final int PUZZLEWIDTH = 5;
-    private static final int PUZZLEHEIGHT = 5;
     private static final int MARGIN = 20;
     private static final int SCREENHEIGHTOFFSET = 30;
     private static Graphics2D g2;
@@ -27,7 +25,7 @@ public class Main {
         f.setResizable(false);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Nonogram myNonogram = new Nonogram(screenWidth, screenHeight - SCREENHEIGHTOFFSET, PUZZLEWIDTH, PUZZLEHEIGHT, MARGIN);
+        Nonogram myNonogram = new Nonogram(screenWidth, screenHeight - SCREENHEIGHTOFFSET, MARGIN);
         JPanel panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
