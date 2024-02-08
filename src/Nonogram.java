@@ -28,7 +28,6 @@ public class Nonogram {
     private final int margin;
     private int maxNumOfColumnClues, maxNumOfRowClues;
     private Font font;
-    private static final int FONTSIZEOFFSET = 8;
 
     private final int useDefault;
     private final ArrayList<MyButton> buttons;
@@ -165,6 +164,7 @@ public class Nonogram {
         FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
         int textWidth, textHeight;
         int cluePadding = 5;
+        int fontSizeOffset = 8;
 
         do {
             font = new Font(name, weight, fontSize);
@@ -173,7 +173,7 @@ public class Nonogram {
             fontSize++;
         } while( textWidth <= boxSize - (cluePadding * 2)  && textHeight <= boxSize - (cluePadding * 2) );
 
-        fontSize -= FONTSIZEOFFSET;
+        fontSize -= fontSizeOffset;
         return fontSize;
     }
 
