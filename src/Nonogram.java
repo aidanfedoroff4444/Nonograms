@@ -6,33 +6,40 @@ import java.awt.geom.AffineTransform;
  * Handle everything to do with printing a nonogram
  */
 public class Nonogram extends Rectangle {
-    private int boxSize = 40;
-    private int maxRowClues = 2, maxColClues = 1;
-    private  int puzzleWidth = 5, puzzleHeight = 5;
+    private final int BOXSIZE = 40;
+    private final int maxRowClues, maxColClues;
+    private final int puzzleWidth, puzzleHeight;
     private Box[][] puzzle;
-    private int[][] columnClues, rowClues;
+    private final int[][] columnClues;
+    private final int[][] rowClues;
 
     public Nonogram(int[][] columnClues, int[][] rowClues) {
         super(100, 100, 0, 0);
-        width = boxSize * (maxRowClues + puzzleWidth);
-        height = boxSize * (maxColClues + puzzleHeight);
+        maxRowClues = rowClues[0].length;
+        maxColClues = columnClues[0].length;
+        puzzleWidth = columnClues.length;
+        puzzleHeight = rowClues.length;
+        width = BOXSIZE * (maxRowClues + puzzleWidth);
+        height = BOXSIZE * (maxColClues + puzzleHeight);
         this.columnClues = columnClues;
         this.rowClues = rowClues;
+
     }
+
     public void paint(Graphics2D g) {
         g.setColor(Color.black);
         g.translate(x, y);
 
         /*
-            Initialize a 2d array of Box objects to represent the puzzle and its clues
-            Initialize all the clues' values and backgrounds
+         *  Initialize a 2d array of Box objects to represent the puzzle and its clues
+         *  Initialize all the clues' values and backgrounds
          */
         puzzle = new Box[puzzleHeight + maxColClues][puzzleWidth + maxRowClues];
         for(int i = 0; i < puzzle.length; i++) {
             // Runs for each row
             for(int j = 0; j < puzzle[0].length; j++) {
                 // Runs for each column inside each row
-                puzzle[i][j] = new Box(boxSize * j, boxSize * i, boxSize, boxSize, 0);
+                puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0);
 
                 // Set the border width of each box
                 int[] squareBorderWidths = new int[] {1, 1, 1, 1};
@@ -45,6 +52,9 @@ public class Nonogram extends Rectangle {
                 if(i == maxColClues - 1) squareBorderWidths[2]++; // For the bottom edges of the column clues
                 if(j == maxRowClues - 1) squareBorderWidths[1]++; // For the right edges of the row clues
 
+                if(i >= maxColClues && i % 5 == maxColClues) squareBorderWidths[0]++; // For each fifth row
+                if(j >= maxRowClues && j % 5 == maxRowClues) squareBorderWidths[3]++; // For each fifth collumn
+
                 puzzle[i][j].setBorders(squareBorderWidths);
 
                 // Set the background of the clues to light gray
@@ -54,6 +64,7 @@ public class Nonogram extends Rectangle {
                 if(i < maxColClues && j >= maxRowClues) puzzle[i][j].setValue(columnClues[j - maxRowClues][i]);
                 // Set the value of the boxes for the rowClues
                 if(j < maxRowClues && i >= maxColClues) puzzle[i][j].setValue(rowClues[i - maxColClues][j]);
+                System.out.println(puzzleWidth);
             }
         }
 
@@ -99,7 +110,7 @@ class Box extends Rectangle {
         g.setStroke(new BasicStroke(borderWidths[3]));
         g.drawLine(x, y, x, y + height);
 
-        // Draw the clues
+        // Draw the values
         if(value != 0) {
             // Prepare the font
             String fontName = "Arial";
@@ -119,44 +130,12 @@ class Box extends Rectangle {
             g.setFont(new Font(fontName, Font.BOLD, fontSize));
 
             // Draw the value
-            System.out.println((int)textHeight);
-            g.drawString(String.valueOf(value), x + (int) textWidth / 2, y + height - (width / 8));
+            g.drawString(String.valueOf(value), x + (int) textWidth / 2, y + height - (height / 8));
         }
 
         g.setColor(tempColor);
     }
-    /*
-    private int getMaximumFontSize(String name, int weight) {
-        String text = "00";
-        int fontSize = 12;
-        Font font;
-        FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
-        int textWidth, textHeight;
-        int cluePadding = 5;
-        int fontSizeOffset = 8;
-
-        do {
-            font = new Font(name, weight, fontSize);
-            textWidth = (int)(font.getStringBounds(text, frc).getWidth());
-            textHeight = (int)(font.getStringBounds(text, frc).getHeight());
-            fontSize++;
-        } while( textWidth <= boxSize - (cluePadding * 2)  && textHeight <= boxSize - (cluePadding * 2) );
-
-        fontSize -= fontSizeOffset;
-        return fontSize;
-    }
-    */
-
-    public int[] getBorderWidths() {
-        return borderWidths;
-    }
-    public void setBorders(int[] newBorderWidths) {
-        borderWidths = newBorderWidths;
-    }
-    public void setBackground(Color newBackground) {
-        background = newBackground;
-    }
-    public void setValue(int newValue) {
-        value = newValue;
-    }
+    public void setBorders(int[] newBorderWidths) { borderWidths = newBorderWidths; }
+    public void setBackground(Color newBackground) { background = newBackground; }
+    public void setValue(int newValue) { value = newValue; }
 }
