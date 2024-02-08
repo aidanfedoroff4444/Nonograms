@@ -1,41 +1,33 @@
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
 
-/**
- * Handle everything to do with printing a nonogram
- */
-public class Nonogram extends Rectangle {
+public class EditableNonogram extends Rectangle {
     private final int BOXSIZE = 40;
-    private final int maxRowClues, maxColClues;
-    private final int puzzleWidth, puzzleHeight;
+    private int maxRowClues, maxColClues;
+    private int puzzleWidth = 10, puzzleHeight = 10;
     private Box[][] puzzle;
-    private final int[][] columnClues, rowClues;
+    private int[][] rowClues, columnClues;
 
-    public Nonogram(int[][] columnClues, int[][] rowClues) {
+    public EditableNonogram() {
         super(100, 100, 0, 0);
-        maxRowClues = rowClues[0].length;
-        maxColClues = columnClues[0].length;
-        puzzleWidth = columnClues.length;
-        puzzleHeight = rowClues.length;
+        maxRowClues = 1;
+        maxColClues = 1;
         width = BOXSIZE * (maxRowClues + puzzleWidth);
         height = BOXSIZE * (maxColClues + puzzleHeight);
-        this.columnClues = columnClues;
-        this.rowClues = rowClues;
 
         puzzle = new Box[puzzleHeight + maxColClues][puzzleWidth + maxRowClues];
+
+        rowClues = new int[puzzleHeight][1];
+        columnClues = new int[puzzleWidth][1];
+        for(int i = 0; i < columnClues.length; i++) columnClues[i] = new int[] {0};
+        for(int i = 0; i < rowClues.length; i++) rowClues[i] = new int[] {0};
     }
 
     public void paint(Graphics2D g) {
         g.setColor(Color.black);
         g.translate(x, y);
 
-        /*
-         *  Initialize a 2d array of Box objects to represent the puzzle and its clues
-         *  Initialize all the clues' values and backgrounds
-         */
-        for(int i = 0; i < puzzle.length; i++) { // Runs for each row
-            for(int j = 0; j < puzzle[0].length; j++) { // Runs for each column inside each row
+        for(int i = 0; i < puzzle.length; i++) { // For each row
+            for(int j = 0; j < puzzle[0].length; j++) { // For each column in each row
                 puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0);
 
                 // Set the border width of each box

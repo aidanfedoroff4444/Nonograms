@@ -43,8 +43,12 @@ public class GameWindow extends JFrame {
             @Override
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
-                Nonogram nonogram = new Nonogram(columnClues, rowClues);
-                nonogram.paint(g2);
+
+                EditableNonogram editableNonogram = new EditableNonogram();
+                editableNonogram.paint(g2);
+
+                // Nonogram nonogram = new Nonogram(columnClues, rowClues);
+                // nonogram.paint(g2);
             }
         };
         add(panel);
