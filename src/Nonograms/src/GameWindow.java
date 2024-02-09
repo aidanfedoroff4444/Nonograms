@@ -1,13 +1,21 @@
+package Nonograms.src;
+
+import Nonograms.src.EditableNonogram;
+import Nonograms.src.Nonogram;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 /**
  *
  */
 public class GameWindow extends JFrame {
     private final GraphicsDevice device;
+    private EditableNonogram editableNonogram;
+    private Nonogram nonogram;
+
+    private JPanel panel;
 
     private final int[][] columnClues = new int[][] {
             {0,0,2},
@@ -39,12 +47,12 @@ public class GameWindow extends JFrame {
         /*
             Draw everything on the GameWindow under the menu
          */
-        JPanel panel = new JPanel() {
+        panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
 
-                EditableNonogram editableNonogram = new EditableNonogram();
+                editableNonogram = new EditableNonogram();
                 editableNonogram.paint(g2);
 
                 // Nonogram nonogram = new Nonogram(columnClues, rowClues);
@@ -52,6 +60,30 @@ public class GameWindow extends JFrame {
             }
         };
         add(panel);
+
+        JFrame frame = this;
+
+        getContentPane().addMouseListener(new MouseListener() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                System.out.println("click: (" + e.getX() + "," + e.getY() + ")");
+                editableNonogram.mousePressed(e, frame);
+                frame.repaint();
+            }
+            public void mouseReleased(MouseEvent e) {
+
+            }
+            public void mouseEntered(MouseEvent e) {
+
+            }
+            public void mouseExited(MouseEvent e) {
+
+            }
+            public void mouseClicked(MouseEvent e) {
+
+            }
+        });
+
         this.device = device;
     }
 
