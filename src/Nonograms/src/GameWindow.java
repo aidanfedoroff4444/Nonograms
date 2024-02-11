@@ -12,7 +12,7 @@ import java.awt.event.*;
  */
 public class GameWindow extends JFrame {
     private final GraphicsDevice device;
-    private EditableNonogram editableNonogram;
+    private EditableNonogram editableNonogram = new EditableNonogram();;
     private Nonogram nonogram;
 
     private JPanel panel;
@@ -52,7 +52,6 @@ public class GameWindow extends JFrame {
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
 
-                editableNonogram = new EditableNonogram();
                 editableNonogram.paint(g2);
 
                 // Nonogram nonogram = new Nonogram(columnClues, rowClues);
@@ -66,8 +65,11 @@ public class GameWindow extends JFrame {
         getContentPane().addMouseListener(new MouseListener() {
             @Override
             public void mousePressed(MouseEvent e) {
-                System.out.println("click: (" + e.getX() + "," + e.getY() + ")");
+                // System.out.println("click: (" + e.getX() + "," + e.getY() + ")");
+                editableNonogram.printClues();
                 editableNonogram.mousePressed(e, frame);
+                editableNonogram.printClues();
+
                 frame.repaint();
             }
             public void mouseReleased(MouseEvent e) {

@@ -6,12 +6,11 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
 public class EditableNonogram extends Rectangle {
-    private final int BOXSIZE = 40;
-    private int maxRowClues, maxColClues;
+    public final int BOXSIZE = 40;
+    public int maxRowClues, maxColClues;
     private int puzzleWidth = 10, puzzleHeight = 10;
     private Box[][] puzzle;
     private int[][] rowClues, columnClues;
-    private boolean test;
 
     public EditableNonogram() {
         super(100, 100, 0, 0);
@@ -26,8 +25,6 @@ public class EditableNonogram extends Rectangle {
         columnClues = new int[puzzleWidth][1];
         for(int i = 0; i < columnClues.length; i++) columnClues[i] = new int[] {0};
         for(int i = 0; i < rowClues.length; i++) rowClues[i] = new int[] {0};
-
-        test = false;
     }
 
     public void mousePressed(MouseEvent e, JFrame frame) {
@@ -37,51 +34,99 @@ public class EditableNonogram extends Rectangle {
         // System.out.println("Box is in (row,col): (" + (mY - y) / BOXSIZE + "," + (mX - x) / BOXSIZE + ")");
         int boxRow = (mY - y) / BOXSIZE;
         int boxCol = (mX - x) / BOXSIZE;
-        if(boxRow < maxColClues && boxCol >= maxRowClues) {
+        if(boxRow < maxColClues && boxCol >= maxRowClues) { // if a column clue was clicked
             // Display dialog and receive the clues in a string of int values with a space as a delimiter.
             String clues = (String) JOptionPane.showInputDialog(
                     frame,
                     "Enter the clues for this column, separate each clue with a space.",
                     "Column Clues", JOptionPane.PLAIN_MESSAGE,
                     null, null, "");
-            // Assign the new clues to their respective place in columnClues
             if (clues == null) return;
+
+            // Assign the new clues to their respective place in columnClues
             String[] cluesArr = clues.split(" ");
             int[] intArr = new int[cluesArr.length];
             for (int i = 0; i < cluesArr.length; i++) intArr[i] = Integer.parseInt(cluesArr[i]);
             // System.out.println(Arrays.toString(intArr));
-            addColumnClueRow(boxCol - 1, intArr);
+            addColumnClueRow(boxCol - maxRowClues, intArr);
+        } else if(boxRow >= maxColClues && boxCol < maxRowClues) { // if a row clue was clicked
+            // Display dialog and receive the clues in a string of int values with a space as a delimiter.
+            String clues = (String) JOptionPane.showInputDialog(
+                    frame,
+                    "Enter the clues for this column, separate each clue with a space.",
+                    "Column Clues", JOptionPane.PLAIN_MESSAGE,
+                    null, null, "");
+            if (clues == null) return;
+
+            // Assign the new clues to their respective place in columnClues
+            String[] cluesArr = clues.split(" ");
+            int[] intArr = new int[cluesArr.length];
+            for (int i = 0; i < cluesArr.length; i++) intArr[i] = Integer.parseInt(cluesArr[i]);
+
+            addRowClueRow(boxRow - maxColClues, intArr);
         }
     }
 
+    /**
+     * @param colIndex int, The index in columnClues that the clueArr @param belongs
+     * @param clueArr int[], The array of int values that make up the new clues to be inserted into columnClues
+     *                2 cases:
+     *                 - clueArr.length <= maxColClues:
+     *                    - add in x 0's to the beginning of the columnClues row, where x is maxColClues - clueArr.length
+     *                    - Complete the columnClues row with the rest of the values copied over from clueArr. columnClues[colIndex].length should equal maxColClues
+     *                 - clueArr.length >  maxColClues:
+     *                    - copy over everything in puzzle into a new Box[][] array with x additional rows, where x is clueArr.length - maxColClues
+     *                       - all the rows should be the same except for the additional x 0's placed before all the values in the row
+     *                    - copy the clueArr into the columnClues[colIndex] array from index 0.
+     */
     public void addColumnClueRow(int colIndex, int[] clueArr) {
-        if(clueArr.length > columnClues[0].length) { // Need to enlarge the other rows of the columnClues 2D array by putting a 0 as the new first element of each row.
-            for(int i = 0; i < columnClues.length; i++) { // Runs for each row in columnClues
-                int[] newRow = new int[clueArr.length];
-                newRow[0] = 0;
-                // Fill the rest of the newRow with the rest of the values already in the row of columnClues
-                System.arraycopy(columnClues[i], 0, newRow, 1, columnClues[i].length);
-                columnClues[i] = newRow;
+        if(clueArr.length <= maxColClues) {
+            // add in x 0's to the beginning of the columnClues row, where x is maxColClues - clueArr.length
+            for(int i = 0; i < maxColClues - clueArr.length; i++) columnClues[colIndex][i] = 0;
+            // Complete the columnClues row with the rest of the values copied over from clueArr. columnClues[colIndex].length should equal maxColClues
+            System.arraycopy(clueArr, 0, columnClues[colIndex], maxColClues - clueArr.length, clueArr.length);
+        } else {
+            for(int i = 0; i < clueArr.length - maxColClues; i++) { // Runs for each 0 to be added to each row in columnClues
+                for(int j = 0; j < columnClues.length; j++) {
+                    int[] newRow = new int[columnClues[j].length + 1];
+                    newRow[0] = 0;
+                    System.arraycopy(columnClues[j], 0, newRow, 1, columnClues[j].length);
+                    columnClues[j] = newRow;
+                }
             }
-            maxColClues = columnClues[0].length;
+            maxColClues += clueArr.length - maxColClues;
             height = BOXSIZE * (maxColClues + puzzleHeight);
-
             puzzle = new Box[puzzleHeight + maxColClues][puzzleWidth + maxRowClues];
+
+            System.arraycopy(clueArr, 0, columnClues[colIndex], clueArr.length - maxColClues, clueArr.length);
         }
-        // Assign the new clueArr row to the respective row in columnClues given by colIndex
-        columnClues[colIndex] = clueArr;
-        System.out.println(Arrays.deepToString(columnClues));
-        test = true;
+    }
+    public void addRowClueRow(int rowIndex, int[] clueArr) {
+        if(clueArr.length <= maxRowClues) {
+            // add in x 0's to the beginning of the columnClues row, where x is maxColClues - clueArr.length
+            for(int i = 0; i < maxRowClues - clueArr.length; i++) rowClues[rowIndex][i] = 0;
+            // Complete the columnClues row with the rest of the values copied over from clueArr. columnClues[colIndex].length should equal maxColClues
+            System.arraycopy(clueArr, 0, rowClues[rowIndex], maxRowClues - clueArr.length, clueArr.length);
+        } else {
+            for(int i = 0; i < clueArr.length - maxRowClues; i++) { // Runs for each 0 to be added to each row in columnClues
+                for(int j = 0; j < rowClues.length; j++) {
+                    int[] newRow = new int[rowClues[j].length + 1];
+                    newRow[0] = 0;
+                    System.arraycopy(rowClues[j], 0, newRow, 1, rowClues[j].length);
+                    rowClues[j] = newRow;
+                }
+            }
+            maxRowClues += clueArr.length - maxRowClues;
+            width = BOXSIZE * (maxRowClues + puzzleWidth);
+            puzzle = new Box[puzzleHeight + maxColClues][puzzleWidth + maxRowClues];
+
+            System.arraycopy(clueArr, 0, rowClues[rowIndex], clueArr.length - maxRowClues, clueArr.length);
+        }
     }
 
     public void paint(Graphics2D g) {
-        System.out.println("columnClues: " + Arrays.deepToString(columnClues));
+        // System.out.println("columnClues: " + Arrays.deepToString(columnClues));
         g.setColor(Color.black);
-
-        System.out.println("1: " + test);
-        if(test) {
-            System.out.println("Test");
-        }
 
         g.translate(x, y);
 
@@ -110,7 +155,6 @@ public class EditableNonogram extends Rectangle {
 
                 // Set the value of the boxes for the columnClues
                 if(i < maxColClues && j >= maxRowClues) {
-                    if(columnClues[j - maxRowClues][i] == 1) System.out.println("Found a 1");
                     puzzle[i][j].setValue(columnClues[j - maxRowClues][i]);
                 }
                 // Set the value of the boxes for the rowClues
@@ -121,5 +165,9 @@ public class EditableNonogram extends Rectangle {
         for(Box[] boxRow : puzzle)
             for(Box box : boxRow)
                 box.paint(g); // Draw each square
+    }
+
+    public void printClues() {
+        System.out.println(Arrays.deepToString(columnClues));
     }
 }
