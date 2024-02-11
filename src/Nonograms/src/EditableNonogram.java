@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class EditableNonogram extends Rectangle {
     public final int BOXSIZE = 40;
     public int maxRowClues, maxColClues;
-    private int puzzleWidth = 10, puzzleHeight = 10;
+    private final int puzzleWidth = 10, puzzleHeight = 10;
     private Box[][] puzzle;
     private int[][] rowClues, columnClues;
 
@@ -31,25 +31,10 @@ public class EditableNonogram extends Rectangle {
         int mX = e.getX();
         int mY = e.getY();
         if(!(mX >= x && mY >= y && mX <= x + width && mY <= y + height)) return; // Quits if the mouse click was outside the puzzle
-        // System.out.println("Box is in (row,col): (" + (mY - y) / BOXSIZE + "," + (mX - x) / BOXSIZE + ")");
+
         int boxRow = (mY - y) / BOXSIZE;
         int boxCol = (mX - x) / BOXSIZE;
-        if(boxRow < maxColClues && boxCol >= maxRowClues) { // if a column clue was clicked
-            // Display dialog and receive the clues in a string of int values with a space as a delimiter.
-            String clues = (String) JOptionPane.showInputDialog(
-                    frame,
-                    "Enter the clues for this column, separate each clue with a space.",
-                    "Column Clues", JOptionPane.PLAIN_MESSAGE,
-                    null, null, "");
-            if (clues == null) return;
-
-            // Assign the new clues to their respective place in columnClues
-            String[] cluesArr = clues.split(" ");
-            int[] intArr = new int[cluesArr.length];
-            for (int i = 0; i < cluesArr.length; i++) intArr[i] = Integer.parseInt(cluesArr[i]);
-            // System.out.println(Arrays.toString(intArr));
-            addColumnClueRow(boxCol - maxRowClues, intArr);
-        } else if(boxRow >= maxColClues && boxCol < maxRowClues) { // if a row clue was clicked
+        if((boxRow < maxColClues && boxCol >= maxRowClues) || (boxRow >= maxColClues && boxCol < maxRowClues)) { // if a column clue was clicked
             // Display dialog and receive the clues in a string of int values with a space as a delimiter.
             String clues = (String) JOptionPane.showInputDialog(
                     frame,
@@ -63,7 +48,8 @@ public class EditableNonogram extends Rectangle {
             int[] intArr = new int[cluesArr.length];
             for (int i = 0; i < cluesArr.length; i++) intArr[i] = Integer.parseInt(cluesArr[i]);
 
-            addRowClueRow(boxRow - maxColClues, intArr);
+            if(boxRow < maxColClues && boxCol >= maxRowClues) addColumnClueRow(boxCol - maxRowClues, intArr);
+            else if(boxRow >= maxColClues && boxCol < maxRowClues) addRowClueRow(boxRow - maxColClues, intArr); // if a row clue was clicked
         }
     }
 
@@ -125,14 +111,13 @@ public class EditableNonogram extends Rectangle {
     }
 
     public void paint(Graphics2D g) {
-        // System.out.println("columnClues: " + Arrays.deepToString(columnClues));
         g.setColor(Color.black);
 
         g.translate(x, y);
 
         for(int i = 0; i < height / BOXSIZE; i++) { // For each row
             for(int j = 0; j < width / BOXSIZE; j++) { // For each column in each row
-                puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0);
+                puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0, false);
 
                 // Set the border width of each box
                 int[] squareBorderWidths = new int[] {1, 1, 1, 1};
@@ -169,5 +154,13 @@ public class EditableNonogram extends Rectangle {
 
     public void printClues() {
         System.out.println(Arrays.deepToString(columnClues));
+    }
+
+    public int[][] getColumnClues() {
+        return columnClues;
+    }
+
+    public int[][] getRowClues() {
+        return rowClues;
     }
 }

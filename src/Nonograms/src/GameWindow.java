@@ -6,6 +6,7 @@ import Nonograms.src.Nonogram;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Arrays;
 
 /**
  *
@@ -14,6 +15,7 @@ public class GameWindow extends JFrame {
     private final GraphicsDevice device;
     private EditableNonogram editableNonogram = new EditableNonogram();;
     private Nonogram nonogram;
+    private boolean editing = true;
 
     private JPanel panel;
 
@@ -51,11 +53,8 @@ public class GameWindow extends JFrame {
             @Override
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
-
-                editableNonogram.paint(g2);
-
-                // Nonogram nonogram = new Nonogram(columnClues, rowClues);
-                // nonogram.paint(g2);
+                if(editing) editableNonogram.paint(g2);
+                else nonogram.paint(g2);
             }
         };
         add(panel);
@@ -65,25 +64,14 @@ public class GameWindow extends JFrame {
         getContentPane().addMouseListener(new MouseListener() {
             @Override
             public void mousePressed(MouseEvent e) {
-                // System.out.println("click: (" + e.getX() + "," + e.getY() + ")");
-                editableNonogram.printClues();
-                editableNonogram.mousePressed(e, frame);
-                editableNonogram.printClues();
-
+                if(editing) editableNonogram.mousePressed(e, frame);
+                else nonogram.mousePressed(e);
                 frame.repaint();
             }
-            public void mouseReleased(MouseEvent e) {
-
-            }
-            public void mouseEntered(MouseEvent e) {
-
-            }
-            public void mouseExited(MouseEvent e) {
-
-            }
-            public void mouseClicked(MouseEvent e) {
-
-            }
+            public void mouseReleased(MouseEvent e) {}
+            public void mouseEntered(MouseEvent e) {}
+            public void mouseExited(MouseEvent e) {}
+            public void mouseClicked(MouseEvent e) {}
         });
 
         this.device = device;
@@ -95,32 +83,23 @@ public class GameWindow extends JFrame {
         fileMenu.setMnemonic(KeyEvent.VK_F); // Set the keyboard key associated with choosing this option
         menuBar.add(fileMenu); // Add the menu to the menu bar
 
-        /*
-        JMenu openMenu = new JMenu("Sub-menu:");
-        openMenu.setMnemonic(KeyEvent.VK_O);
-
-        JMenuItem nonogramItem = new JMenuItem("Sub-menu item");
-        nonogramItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
-        nonogramItem.addActionListener(e -> {
-            game = 0;
-            panel.repaint();
+        JMenuItem start = new JMenuItem("Start:");
+        start.setMnemonic(KeyEvent.VK_S);
+        start.setAccelerator(KeyStroke.getKeyStroke('s'));
+        start.addActionListener(e -> {
+            if(editing) {
+                editing = false;
+                nonogram = new Nonogram(editableNonogram.getColumnClues(), editableNonogram.getRowClues());
+                // System.out.println("columnClues: " + Arrays.deepToString(editableNonogram.getColumnClues()));
+                // System.out.println("rowCLues: " + Arrays.deepToString(editableNonogram.getRowClues()));
+                repaint();
+            }
         });
-        openMenu.add(nonogramItem);
-
-        JMenuItem engineItem = new JMenuItem("Sub-menu item");
-        engineItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK));
-        engineItem.addActionListener(e -> {
-            game = 1;
-            panel.repaint();
-        });
-        openMenu.add(engineItem);
-
-        fileMenu.add(openMenu);
+        fileMenu.add(start);
         fileMenu.addSeparator();
-         */
 
-        JMenuItem exitItem = new JMenuItem("Exit", KeyEvent.VK_X);
-        exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.ALT_DOWN_MASK));
+        JMenuItem exitItem = new JMenuItem("Exit", KeyEvent.VK_ESCAPE);
+        exitItem.setAccelerator(KeyStroke.getKeyStroke((char) KeyEvent.VK_ESCAPE));
         exitItem.addActionListener(e -> System.exit(0));
         fileMenu.add(exitItem);
 

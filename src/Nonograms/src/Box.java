@@ -1,6 +1,7 @@
 package Nonograms.src;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 
@@ -9,14 +10,22 @@ public class Box extends Rectangle {
     private Color background; // The background of the square
     public int symbol = 0; // 0 for empty, 1 for filled, 2 for dot
     private int value;
+    private final boolean EDITABLE;
 
-    public Box(int x, int y, int width, int height, int symbol) {
+    public Box(int x, int y, int width, int height, int symbol, boolean editable) {
         super(x, y, width, height);
         this.symbol = symbol;
 
         borderWidths = new int[] {1, 1, 1, 1};
         background = Color.white;
         value = 0;
+
+        EDITABLE = editable;
+    }
+
+    public void mousePressed(MouseEvent e) {
+        System.out.println("A box was clicked!");
+        symbol = (symbol + 1) % 3;
     }
 
     public void paint(Graphics2D g) {
@@ -61,6 +70,15 @@ public class Box extends Rectangle {
 
             // Draw the value
             g.drawString(String.valueOf(value), x + (int) textWidth / 2, y + height - (height / 8));
+        }
+
+        // Draw the symbol
+        if(symbol == 1) {
+            System.out.println("Tried to draw filled box");
+            g.fillRect(x, y, width, height);
+        } else if(symbol == 2) {
+            System.out.println("Tried to draw dot");
+            g.fillOval(x, y, width, height);
         }
 
         g.setColor(tempColor);

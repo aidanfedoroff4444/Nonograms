@@ -1,8 +1,8 @@
 package Nonograms.src;
 
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
+import java.awt.event.MouseEvent;
+
 /**
  * Handle everything to do with printing a nonogram
  */
@@ -27,6 +27,22 @@ public class Nonogram extends Rectangle {
         puzzle = new Box[puzzleHeight + maxColClues][puzzleWidth + maxRowClues];
     }
 
+    public void mousePressed(MouseEvent e) {
+        int mX = e.getX();
+        int mY = e.getY();
+
+        // If the click was inside the puzzle
+        if(mX >= x && mX <= x + width && mY >= y && mY <= y + height) {
+            // Get the boxRow and boxCol that was clicked
+            int boxRow = (mY - y) / BOXSIZE;
+            int boxCol = (mX - x) / BOXSIZE;
+            // If the box that was clicked was inside the puzzle and not in the clue area
+            if(boxRow >= maxColClues && boxCol >= maxRowClues)
+                // Call the appropriate mousePressed(e) function for the correct box that was clicked
+                puzzle[boxRow][boxCol].mousePressed(e);
+        }
+    }
+
     public void paint(Graphics2D g) {
         g.setColor(Color.black);
         g.translate(x, y);
@@ -37,7 +53,7 @@ public class Nonogram extends Rectangle {
          */
         for(int i = 0; i < puzzle.length; i++) { // Runs for each row
             for(int j = 0; j < puzzle[0].length; j++) { // Runs for each column inside each row
-                puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0);
+                puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0, true);
 
                 // Set the border width of each box
                 int[] squareBorderWidths = new int[] {1, 1, 1, 1};
