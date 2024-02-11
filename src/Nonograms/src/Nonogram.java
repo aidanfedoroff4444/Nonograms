@@ -7,11 +7,12 @@ import java.awt.event.MouseEvent;
  * Handle everything to do with printing a nonogram
  */
 public class Nonogram extends Rectangle {
-    private final int BOXSIZE = 40;
+    public final int BOXSIZE = 40;
     private final int maxRowClues, maxColClues;
     private final int puzzleWidth, puzzleHeight;
-    private Box[][] puzzle;
+    public Box[][] puzzle;
     private final int[][] columnClues, rowClues;
+    public int focusedRow, focusedCol;
 
     public Nonogram(int[][] columnClues, int[][] rowClues) {
         super(100, 100, 0, 0);
@@ -53,8 +54,8 @@ public class Nonogram extends Rectangle {
          */
         for(int i = 0; i < puzzle.length; i++) { // Runs for each row
             for(int j = 0; j < puzzle[0].length; j++) { // Runs for each column inside each row
-                if(puzzle[i][j] != null && puzzle[i][j].symbol != 0) System.out.println("symbol: " + puzzle[i][j].symbol);
-                else puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0, true);
+                if(puzzle[i][j] == null || puzzle[i][j].symbol == 0)
+                    puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0, true);
 
                 // Set the border width of each box
                 int[] squareBorderWidths = new int[] {1, 1, 1, 1};
@@ -75,6 +76,10 @@ public class Nonogram extends Rectangle {
                 // Set the background of the clues to light gray
                 if(i < maxColClues || j < maxRowClues) puzzle[i][j].setBackground(Color.lightGray);
 
+                // Set the background of the focusedRow and focusedCol clue col/row with a slightly lighter gray
+                if(focusedRow >= maxColClues && i == focusedRow && j < maxRowClues) puzzle[i][j].setBackground(new Color(220, 220, 220));
+                if(focusedCol >= maxRowClues && j == focusedCol && i < maxColClues) puzzle[i][j].setBackground(new Color(220, 220, 220));
+
                 // Set the value of the boxes for the columnClues
                 if(i < maxColClues && j >= maxRowClues) puzzle[i][j].setValue(columnClues[j - maxRowClues][i]);
                 // Set the value of the boxes for the rowClues
@@ -85,5 +90,23 @@ public class Nonogram extends Rectangle {
         for(Box[] boxRow : puzzle)
             for(Box box : boxRow)
                 box.paint(g); // Draw each square
+    }
+
+    public void mouseMoved(MouseEvent e) {
+        int mX = e.getX();
+        int mY = e.getY();
+        // Set the focusedRow and focusedCol relative to the column and row of the current mouse position
+        focusedRow = (mY - y) / BOXSIZE;
+        focusedCol = (mX - x) / BOXSIZE;
+    }
+
+    public void mouseDragged(MouseEvent e, int newSymbol) {
+        int mX = e.getX();
+        int mY = e.getY();
+        int boxCol = (mX - x) / BOXSIZE;
+        int boxRow = (mY - y) / BOXSIZE;
+        if(boxRow >= maxRowClues && boxCol >= maxColClues)
+            // Set the box under the mouse to the newSymbol
+            puzzle[boxRow][boxCol].symbol = newSymbol;
     }
 }

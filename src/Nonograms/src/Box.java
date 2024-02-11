@@ -25,7 +25,6 @@ public class Box extends Rectangle {
 
     public void mousePressed(MouseEvent e) {
         if(EDITABLE) symbol = (symbol + 1) % 3;
-        System.out.println("symbol is now: " + symbol);
     }
 
     public void paint(Graphics2D g) {
@@ -69,17 +68,12 @@ public class Box extends Rectangle {
             g.setFont(new Font(fontName, Font.BOLD, fontSize));
 
             // Draw the value
-            g.drawString(String.valueOf(value), x + (int) textWidth / 2, y + height - (height / 8));
+            g.drawString(String.valueOf(value), x + (int) (width - textWidth) / 2, y + height - (height / 8));
         }
 
         // Draw the symbol
-        if(symbol == 1) {
-            System.out.println("Tried to draw filled box");
-            g.fillRect(x, y, width, height);
-        } else if(symbol == 2) {
-            System.out.println("Tried to draw dot");
-            g.fillOval(x + width * 3 / 8, y + height * 3 / 8, width / 4, height / 4);
-        }
+        if(symbol == 1) g.fillRect(x, y, width, height); // A filled square
+        else if(symbol == 2) g.fillOval(x + width * 3 / 8, y + height * 3 / 8, width / 4, height / 4); // A centered dot
 
         g.setColor(tempColor);
     }

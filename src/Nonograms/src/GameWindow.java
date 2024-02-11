@@ -1,45 +1,20 @@
 package Nonograms.src;
 
-import Nonograms.src.EditableNonogram;
-import Nonograms.src.Nonogram;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Arrays;
 
 /**
  *
  */
 public class GameWindow extends JFrame {
     private final GraphicsDevice device;
-    private EditableNonogram editableNonogram = new EditableNonogram();;
+    private final EditableNonogram editableNonogram = new EditableNonogram();;
     private Nonogram nonogram;
     private boolean editing = true;
-
     private JPanel panel;
-
-    private final int[][] columnClues = new int[][] {
-            {0,0,2},
-            {0,2,1},
-            {0,0,6},
-            {0,0,3},
-            {0,0,4},
-            {0,1,5},
-            {1,2,1},
-            {0,0,3},
-            {0,0,2},
-    };
-    private final int[][] rowClues = new int[][] {
-            {0,0,4},
-            {0,5,1},
-            {0,7,1},
-            {1,1,5},
-            {0,3,4},
-            {0,1,1},
-            {0,1,1},
-            {0,1,1},
-    };
+    private boolean clicking;
+    private int dragSymbol;
 
     public GameWindow(GraphicsDevice device) {
         super("Nonogram Editor", device.getDefaultConfiguration());
@@ -64,14 +39,50 @@ public class GameWindow extends JFrame {
         getContentPane().addMouseListener(new MouseListener() {
             @Override
             public void mousePressed(MouseEvent e) {
+                int mX = e.getX();
+                int mY = e.getY();
                 if(editing) editableNonogram.mousePressed(e, frame);
-                else nonogram.mousePressed(e);
+                else {
+                    nonogram.mousePressed(e);
+                    // Set the drag symbol to the next symbol of whatever is immediately under the click
+                    if(mX >= nonogram.x && mX <= nonogram.x + nonogram.width && mY >= nonogram.y && mY <= nonogram.y + nonogram.height) {
+                        int boxRow = (mY - nonogram.y) / nonogram.BOXSIZE;
+                        int boxCol = (mX - nonogram.x) / nonogram.BOXSIZE;
+                        dragSymbol = nonogram.puzzle[boxRow][boxCol].symbol;
+                    }
+                }
                 frame.repaint();
+                clicking = true;
             }
-            public void mouseReleased(MouseEvent e) {}
+            public void mouseReleased(MouseEvent e) {
+                clicking = false;
+            }
             public void mouseEntered(MouseEvent e) {}
             public void mouseExited(MouseEvent e) {}
-            public void mouseClicked(MouseEvent e) {}
+            public void mouseClicked(MouseEvent e) {
+            }
+        });
+
+        getContentPane().addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int mX = e.getX();
+                int mY = e.getY();
+                if(!editing && mX >= nonogram.x && mX <= nonogram.x + nonogram.width && mY >= nonogram.y && mY <= nonogram.y + nonogram.height) {
+                    nonogram.mouseMoved(e);
+                    frame.repaint();
+                }
+            }
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                // System.out.println("A new drag event");
+                int mX = e.getX();
+                int mY = e.getY();
+                if(!editing && mX >= nonogram.x && mX <= nonogram.x + nonogram.width && mY >= nonogram.y && mY <= nonogram.y + nonogram.height) {
+                    nonogram.mouseDragged(e, dragSymbol);
+                    frame.repaint();
+                }
+            }
         });
 
         this.device = device;
@@ -83,15 +94,13 @@ public class GameWindow extends JFrame {
         fileMenu.setMnemonic(KeyEvent.VK_F); // Set the keyboard key associated with choosing this option
         menuBar.add(fileMenu); // Add the menu to the menu bar
 
-        JMenuItem start = new JMenuItem("Start:");
+        JMenuItem start = new JMenuItem("Start Puzzle");
         start.setMnemonic(KeyEvent.VK_S);
         start.setAccelerator(KeyStroke.getKeyStroke('s'));
         start.addActionListener(e -> {
             if(editing) {
                 editing = false;
                 nonogram = new Nonogram(editableNonogram.getColumnClues(), editableNonogram.getRowClues());
-                // System.out.println("columnClues: " + Arrays.deepToString(editableNonogram.getColumnClues()));
-                // System.out.println("rowCLues: " + Arrays.deepToString(editableNonogram.getRowClues()));
                 repaint();
             }
         });
@@ -119,5 +128,4 @@ public class GameWindow extends JFrame {
         GameWindow gameWindow = new GameWindow(device);
         gameWindow.begin();
     }
-
 }

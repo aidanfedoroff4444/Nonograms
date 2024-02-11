@@ -3,7 +3,6 @@ package Nonograms.src;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 
 public class EditableNonogram extends Rectangle {
     public final int BOXSIZE = 40;
