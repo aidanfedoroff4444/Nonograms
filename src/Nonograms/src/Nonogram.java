@@ -53,7 +53,8 @@ public class Nonogram extends Rectangle {
          */
         for(int i = 0; i < puzzle.length; i++) { // Runs for each row
             for(int j = 0; j < puzzle[0].length; j++) { // Runs for each column inside each row
-                puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0, true);
+                if(puzzle[i][j] != null && puzzle[i][j].symbol != 0) System.out.println("symbol: " + puzzle[i][j].symbol);
+                else puzzle[i][j] = new Box(BOXSIZE * j, BOXSIZE * i, BOXSIZE, BOXSIZE, 0, true);
 
                 // Set the border width of each box
                 int[] squareBorderWidths = new int[] {1, 1, 1, 1};

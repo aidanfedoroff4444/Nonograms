@@ -152,10 +152,6 @@ public class EditableNonogram extends Rectangle {
                 box.paint(g); // Draw each square
     }
 
-    public void printClues() {
-        System.out.println(Arrays.deepToString(columnClues));
-    }
-
     public int[][] getColumnClues() {
         return columnClues;
     }

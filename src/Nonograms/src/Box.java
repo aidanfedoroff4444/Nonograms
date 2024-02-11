@@ -24,8 +24,8 @@ public class Box extends Rectangle {
     }
 
     public void mousePressed(MouseEvent e) {
-        System.out.println("A box was clicked!");
-        symbol = (symbol + 1) % 3;
+        if(EDITABLE) symbol = (symbol + 1) % 3;
+        System.out.println("symbol is now: " + symbol);
     }
 
     public void paint(Graphics2D g) {
@@ -78,7 +78,7 @@ public class Box extends Rectangle {
             g.fillRect(x, y, width, height);
         } else if(symbol == 2) {
             System.out.println("Tried to draw dot");
-            g.fillOval(x, y, width, height);
+            g.fillOval(x + width * 3 / 8, y + height * 3 / 8, width / 4, height / 4);
         }
 
         g.setColor(tempColor);
