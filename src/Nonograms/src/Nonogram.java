@@ -2,6 +2,7 @@ package Nonograms.src;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 
 /**
  * Handle everything to do with printing a nonogram
@@ -111,10 +112,74 @@ public class Nonogram extends Rectangle {
     }
 
     public void checkSolution() {
-        // Check each box that is not a clue in the puzzle. if there is one zero than return;
-        for(int i = maxColClues; i < puzzle.length; i++)
-            for(int j = maxRowClues; j < puzzle[0].length; j++)
-                if(puzzle[i][j].symbol == 0) return;
-        System.out.println("Checking Solution");
+        System.out.println("checking solution:");
+        // Checks each box that is not a clue in the puzzle. if there is one zero than return;
+        for(int i = maxColClues; i < puzzle.length; i++) { // Check each row has the same groups in the same order as the clues
+            // Get the groups that are in the row of puzzle[i]
+            // A group has a length and a symbol
+            int currSymbol, prevSymbol = -1, groupLength = 0, groupSymbol = -1;
+            NonogramRowGroups nonogramRowGroups = new NonogramRowGroups();
+            for(int j = maxRowClues; j < puzzle[i].length; j++) {
+                // System.out.println("puzzle.length: " + puzzle.length + " - puzzle[i].length: " + puzzle[i].length + "\ni: " + i + " - j: " + j);
+                if (puzzle[i][j].symbol == 0) {
+                    System.out.println("Checked puzzle but it was incomplete. (i,j): (" + i + "," + j + ")");
+                    return;
+                }
+                currSymbol = puzzle[i][j].symbol;
+
+                // If there is no prevSymbol
+                if(prevSymbol == -1) {
+                    groupLength = 1;
+                    groupSymbol = currSymbol;
+                } else if(currSymbol == prevSymbol) { // If there currSymbol is different from the prevSymbol. print test
+                    // System.out.println("Found two" + currSymbol + " symbols in a row");
+                    groupLength++;
+                } else {
+                    // System.out.println("Found a " + prevSymbol + " symbol next to a " + currSymbol + " symbol");
+                    // add groupLength and groupSymbol to the NonogramRowGroups
+                    nonogramRowGroups.groupSymbols.add(groupSymbol);
+                    nonogramRowGroups.groupLengths.add(groupLength);
+                    groupSymbol = currSymbol;
+                    groupLength = 1;
+                }
+                prevSymbol = currSymbol;
+            }
+            nonogramRowGroups.groupSymbols.add(groupSymbol);
+            nonogramRowGroups.groupLengths.add(groupLength);
+            // All groupLength and groupSymbol pairs have been added for the row
+            // Check that they are valid respective to the relative clues for the row
+            int[] clues = rowClues[i - maxColClues];
+            System.out.println("i: " + i + ". clues: " + Arrays.toString(clues));
+            System.out.println("groupsLengths: " + nonogramRowGroups.groupLengths + "\ngroupSymbols:  " + nonogramRowGroups.groupSymbols);
+
+            // Convert nonogramRowGroups to a single int[x] array of the groups of black squares, where x is The number of non-zero clues in clues
+            int numOfClues = 0;
+            for(int clue : clues) if(clue != 0) numOfClues++;
+            int[] groups = new int[numOfClues];
+            for(int j = 0; j < groups.length; j++) {
+                int index = 0;
+                do {
+                    if(nonogramRowGroups.groupSymbols.get(index) == 1) { // If the symbol of the group is a 1
+                        groups[j] = nonogramRowGroups.groupLengths.get(index);
+                        break;
+                    } else {
+                        index++;
+                    }
+                } while(index < nonogramRowGroups.groupSymbols.size());
+            }
+            System.out.println("groups: " + Arrays.toString(groups));
+
+            // get the non-zero clues in a single array
+            int[] nonZeroClues = new int[numOfClues];
+            int index = 0;
+            for(int j = 0; j < clues.length; j++) {
+                if (clues[j] != 0) {
+                    nonZeroClues[index] = clues[j];
+                    index++;
+                }
+            }
+            System.out.println("nonZeroClues: " + Arrays.toString(nonZeroClues));
+            System.out.println("The row is valid: " + Arrays.equals(nonZeroClues, groups));
+        }
     }
 }

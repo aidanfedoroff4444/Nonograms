@@ -3,6 +3,7 @@ package Nonograms.src;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Arrays;
 
 /**
  *
@@ -15,11 +16,31 @@ public class GameWindow extends JFrame {
     private JPanel panel;
     private boolean clicking;
     private int dragSymbol;
+    private final int[][] rowClues = new int[][] {
+            {0,2},
+            {0,1},
+            {0,3},
+            {0,3},
+            {2,1}
+    };
+    private final int[][] columnClues = new int[][] {
+            {1},
+            {3},
+            {2},
+            {5},
+            {1}
+    };
+    private final boolean TESTING = true;
 
     public GameWindow(GraphicsDevice device) {
         super("Nonogram Editor", device.getDefaultConfiguration());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setJMenuBar(initMenu());
+
+        if(TESTING) {
+            nonogram = new Nonogram(columnClues, rowClues);
+            editing = false;
+        }
 
         /*
             Draw everything on the GameWindow under the menu
@@ -28,8 +49,12 @@ public class GameWindow extends JFrame {
             @Override
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
-                if(editing) editableNonogram.paint(g2);
-                else nonogram.paint(g2);
+                if(TESTING) {
+                    nonogram.paint(g2);
+                } else {
+                    if(editing) editableNonogram.paint(g2);
+                    else nonogram.paint(g2);
+                }
             }
         };
         add(panel);
@@ -101,6 +126,7 @@ public class GameWindow extends JFrame {
             if(editing) {
                 editing = false;
                 nonogram = new Nonogram(editableNonogram.getColumnClues(), editableNonogram.getRowClues());
+                System.out.println("rowClues: " + Arrays.deepToString(editableNonogram.getRowClues()) + "\ncolumnClues: " + Arrays.deepToString(editableNonogram.getColumnClues()));
                 repaint();
             }
         });
