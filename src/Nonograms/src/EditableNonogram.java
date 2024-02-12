@@ -7,7 +7,7 @@ import java.awt.event.MouseEvent;
 public class EditableNonogram extends Rectangle {
     public final int BOXSIZE = 40;
     public int maxRowClues, maxColClues;
-    private final int puzzleWidth = 10, puzzleHeight = 10;
+    private final int puzzleWidth = 5, puzzleHeight = 5;
     private Box[][] puzzle;
     private int[][] rowClues, columnClues;
 

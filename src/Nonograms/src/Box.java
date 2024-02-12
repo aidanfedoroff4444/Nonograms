@@ -33,22 +33,8 @@ public class Box extends Rectangle {
         g.setColor(background);
         g.fillRect(x, y, width, height);
 
-        g.setColor(Color.black);
-        // Draw all 4 edges separately
-        // The top edge
-        g.setStroke(new BasicStroke(borderWidths[0]));
-        g.drawLine(x, y, x + width, y);
-        // The right edge
-        g.setStroke(new BasicStroke(borderWidths[1]));
-        g.drawLine(x + width, y, x + width, y + height);
-        // The bottom edge
-        g.setStroke(new BasicStroke(borderWidths[2]));
-        g.drawLine(x, y + height, x + width, y + height);
-        // The left edge
-        g.setStroke(new BasicStroke(borderWidths[3]));
-        g.drawLine(x, y, x, y + height);
-
         // Draw the values
+        g.setColor(Color.black);
         if(value != 0) {
             // Prepare the font
             String fontName = "Arial";
@@ -72,8 +58,24 @@ public class Box extends Rectangle {
         }
 
         // Draw the symbol
+        g.setColor(new Color(30, 30, 30));
         if(symbol == 1) g.fillRect(x, y, width, height); // A filled square
         else if(symbol == 2) g.fillOval(x + width * 3 / 8, y + height * 3 / 8, width / 4, height / 4); // A centered dot
+
+        g.setColor(Color.black);
+        // Draw all 4 edges separately
+        // The top edge
+        g.setStroke(new BasicStroke(borderWidths[0]));
+        g.drawLine(x, y, x + width, y);
+        // The right edge
+        g.setStroke(new BasicStroke(borderWidths[1]));
+        g.drawLine(x + width, y, x + width, y + height);
+        // The bottom edge
+        g.setStroke(new BasicStroke(borderWidths[2]));
+        g.drawLine(x, y + height, x + width, y + height);
+        // The left edge
+        g.setStroke(new BasicStroke(borderWidths[3]));
+        g.drawLine(x, y, x, y + height);
 
         g.setColor(tempColor);
     }

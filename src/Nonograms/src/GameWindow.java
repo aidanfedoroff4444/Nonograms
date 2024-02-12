@@ -107,6 +107,15 @@ public class GameWindow extends JFrame {
         fileMenu.add(start);
         fileMenu.addSeparator();
 
+        JMenuItem check = new JMenuItem("Check Full Solution");
+        check.setMnemonic(KeyEvent.VK_C);
+        check.setAccelerator(KeyStroke.getKeyStroke('c'));
+        check.addActionListener(e -> { if(!editing) {
+            nonogram.checkSolution();
+        } });
+        fileMenu.add(check);
+        fileMenu.addSeparator();
+
         JMenuItem exitItem = new JMenuItem("Exit", KeyEvent.VK_ESCAPE);
         exitItem.setAccelerator(KeyStroke.getKeyStroke((char) KeyEvent.VK_ESCAPE));
         exitItem.addActionListener(e -> System.exit(0));

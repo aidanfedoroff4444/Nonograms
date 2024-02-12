@@ -109,4 +109,12 @@ public class Nonogram extends Rectangle {
             // Set the box under the mouse to the newSymbol
             puzzle[boxRow][boxCol].symbol = newSymbol;
     }
+
+    public void checkSolution() {
+        // Check each box that is not a clue in the puzzle. if there is one zero than return;
+        for(int i = maxColClues; i < puzzle.length; i++)
+            for(int j = maxRowClues; j < puzzle[0].length; j++)
+                if(puzzle[i][j].symbol == 0) return;
+        System.out.println("Checking Solution");
+    }
 }
