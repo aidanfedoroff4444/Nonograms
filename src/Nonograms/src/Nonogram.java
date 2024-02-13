@@ -2,6 +2,7 @@ package Nonograms.src;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -106,7 +107,7 @@ public class Nonogram extends Rectangle {
         int mY = e.getY();
         int boxCol = (mX - x) / BOXSIZE;
         int boxRow = (mY - y) / BOXSIZE;
-        if(boxRow >= maxRowClues && boxCol >= maxColClues)
+        if(boxCol >= maxRowClues && boxCol < puzzleWidth + maxRowClues && boxRow >= maxColClues && boxRow < puzzleHeight + maxColClues)
             // Set the box under the mouse to the newSymbol
             puzzle[boxRow][boxCol].symbol = newSymbol;
     }
@@ -155,19 +156,13 @@ public class Nonogram extends Rectangle {
             // Convert nonogramRowGroups to a single int[x] array of the groups of black squares, where x is The number of non-zero clues in clues
             int numOfClues = 0;
             for(int clue : clues) if(clue != 0) numOfClues++;
-            int[] groups = new int[numOfClues];
-            for(int j = 0; j < groups.length; j++) {
-                int index = 0;
-                do {
-                    if(nonogramRowGroups.groupSymbols.get(index) == 1) { // If the symbol of the group is a 1
-                        groups[j] = nonogramRowGroups.groupLengths.get(index);
-                        break;
-                    } else {
-                        index++;
-                    }
-                } while(index < nonogramRowGroups.groupSymbols.size());
-            }
-            System.out.println("groups: " + Arrays.toString(groups));
+            ArrayList<Integer> groups = new ArrayList<>();
+            for(int j = 0; j < nonogramRowGroups.groupLengths.size(); j++) // Find each group with a symbol of 1
+                // If the symbol is a 1. add it to groups
+                if(nonogramRowGroups.groupSymbols.get(j) == 1) {
+                    groups.add(nonogramRowGroups.groupLengths.get(j));
+                }
+            System.out.println("groups: " + groups);
 
             // get the non-zero clues in a single array
             int[] nonZeroClues = new int[numOfClues];
@@ -178,8 +173,12 @@ public class Nonogram extends Rectangle {
                     index++;
                 }
             }
+            // Convert groups to an int[]
+            int[] intGroups = new int[groups.size()];
+            for(int j = 0; j < groups.size(); j++) intGroups[j] = groups.get(j);
+
             System.out.println("nonZeroClues: " + Arrays.toString(nonZeroClues));
-            System.out.println("The row is valid: " + Arrays.equals(nonZeroClues, groups));
+            System.out.println("The row is valid: " + Arrays.equals(nonZeroClues, intGroups));
         }
     }
 }

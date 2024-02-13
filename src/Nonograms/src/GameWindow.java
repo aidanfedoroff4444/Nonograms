@@ -161,6 +161,10 @@ public class GameWindow extends JFrame {
         GraphicsDevice device = env.getScreenDevices()[0];
 
         GameWindow gameWindow = new GameWindow(device);
-        gameWindow.begin();
+        gameWindow.setSize(500, 500);
+        gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameWindow.setLocationRelativeTo(null);
+        gameWindow.setVisible(true);
+        // gameWindow.begin();
     }
 }
