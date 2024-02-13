@@ -25,7 +25,6 @@ public class Box extends Rectangle {
 
     public void mousePressed(MouseEvent e) {
         if(EDITABLE) {
-            System.out.println("button: " + e.getButton());
             if(e.getButton() == 1) symbol = (symbol + 1) % 3;
             else if(e.getButton() == 3) {
                 if(symbol == 0) symbol = 2;

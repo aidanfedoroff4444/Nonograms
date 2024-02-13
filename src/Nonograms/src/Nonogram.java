@@ -112,8 +112,35 @@ public class Nonogram extends Rectangle {
             puzzle[boxRow][boxCol].symbol = newSymbol;
     }
 
-    public void checkSolution() {
-        System.out.println("checking solution:");
+    public boolean checkSolution() {
+        // Check the rows of the puzzle
+        // System.out.println("The rows are valid: " + validateCompleteRows(maxColClues, maxRowClues, puzzle, rowClues));
+
+        // Flip the puzzle
+        // Create a new Box[][] array where the rows of the new array are the columns of puzzle
+        Box[][] flippedPuzzle = new Box[puzzle[0].length][puzzle.length];
+        for(int j = 0; j < puzzle[0].length; j++) { // For each column in puzzle
+            Box[] newRow = new Box[puzzle.length];
+            for(int i = 0; i < puzzle.length; i++) {
+                newRow[i] = puzzle[i][j];
+            }
+            flippedPuzzle[j] = newRow;
+        }
+
+        return validateCompleteRows(maxColClues, maxRowClues, puzzle, rowClues) && validateCompleteRows(maxRowClues, maxColClues, flippedPuzzle, columnClues);
+/*
+        int[][] symbols = new int[flippedPuzzle.length][flippedPuzzle[0].length];
+        for(int i = 0; i < flippedPuzzle.length; i++)
+            for(int j = 0 ; j < flippedPuzzle[0].length; j++)
+                symbols[i][j] = flippedPuzzle[i][j].symbol;
+        // System.out.println("symbols: " + Arrays.deepToString(symbols));
+
+        // System.out.println("The rows are valid: " + validateCompleteRows(maxRowClues, maxColClues, flippedPuzzle, columnClues));
+ */
+    }
+
+    public boolean validateCompleteRows(int maxColClues, int maxRowClues, Box[][] puzzle, int[][] rowClues) {
+        // System.out.println("checking solution:");
         // Checks each box that is not a clue in the puzzle. if there is one zero than return;
         for(int i = maxColClues; i < puzzle.length; i++) { // Check each row has the same groups in the same order as the clues
             // Get the groups that are in the row of puzzle[i]
@@ -124,7 +151,7 @@ public class Nonogram extends Rectangle {
                 // System.out.println("puzzle.length: " + puzzle.length + " - puzzle[i].length: " + puzzle[i].length + "\ni: " + i + " - j: " + j);
                 if (puzzle[i][j].symbol == 0) {
                     System.out.println("Checked puzzle but it was incomplete. (i,j): (" + i + "," + j + ")");
-                    return;
+                    return false;
                 }
                 currSymbol = puzzle[i][j].symbol;
 
@@ -150,8 +177,8 @@ public class Nonogram extends Rectangle {
             // All groupLength and groupSymbol pairs have been added for the row
             // Check that they are valid respective to the relative clues for the row
             int[] clues = rowClues[i - maxColClues];
-            System.out.println("i: " + i + ". clues: " + Arrays.toString(clues));
-            System.out.println("groupsLengths: " + nonogramRowGroups.groupLengths + "\ngroupSymbols:  " + nonogramRowGroups.groupSymbols);
+            // System.out.println("i: " + i + ". clues: " + Arrays.toString(clues));
+            // System.out.println("groupsLengths: " + nonogramRowGroups.groupLengths + "\ngroupSymbols:  " + nonogramRowGroups.groupSymbols);
 
             // Convert nonogramRowGroups to a single int[x] array of the groups of black squares, where x is The number of non-zero clues in clues
             int numOfClues = 0;
@@ -162,7 +189,7 @@ public class Nonogram extends Rectangle {
                 if(nonogramRowGroups.groupSymbols.get(j) == 1) {
                     groups.add(nonogramRowGroups.groupLengths.get(j));
                 }
-            System.out.println("groups: " + groups);
+            // System.out.println("groups: " + groups);
 
             // get the non-zero clues in a single array
             int[] nonZeroClues = new int[numOfClues];
@@ -177,8 +204,10 @@ public class Nonogram extends Rectangle {
             int[] intGroups = new int[groups.size()];
             for(int j = 0; j < groups.size(); j++) intGroups[j] = groups.get(j);
 
-            System.out.println("nonZeroClues: " + Arrays.toString(nonZeroClues));
-            System.out.println("The row is valid: " + Arrays.equals(nonZeroClues, intGroups));
+            // System.out.println("nonZeroClues: " + Arrays.toString(nonZeroClues));
+            // System.out.println("The row is valid: " + Arrays.equals(nonZeroClues, intGroups));
+            if(!Arrays.equals(nonZeroClues, intGroups)) return false;
         }
+        return true;
     }
 }

@@ -13,24 +13,9 @@ public class GameWindow extends JFrame {
     private final EditableNonogram editableNonogram = new EditableNonogram();;
     private Nonogram nonogram;
     private boolean editing = true;
-    private JPanel panel;
-    private boolean clicking;
     private int dragSymbol;
-    private final int[][] rowClues = new int[][] {
-            {0,2},
-            {0,1},
-            {0,3},
-            {0,3},
-            {2,1}
-    };
-    private final int[][] columnClues = new int[][] {
-            {1},
-            {3},
-            {2},
-            {5},
-            {1}
-    };
     private final boolean TESTING = true;
+    private static final boolean openInFullscreen = false;
 
     public GameWindow(GraphicsDevice device) {
         super("Nonogram Editor", device.getDefaultConfiguration());
@@ -38,6 +23,20 @@ public class GameWindow extends JFrame {
         setJMenuBar(initMenu());
 
         if(TESTING) {
+            int[][] columnClues = new int[][]{
+                    {1},
+                    {3},
+                    {2},
+                    {5},
+                    {1}
+            };
+            int[][] rowClues = new int[][]{
+                    {0, 2},
+                    {0, 1},
+                    {0, 3},
+                    {0, 3},
+                    {2, 1}
+            };
             nonogram = new Nonogram(columnClues, rowClues);
             editing = false;
         }
@@ -45,14 +44,14 @@ public class GameWindow extends JFrame {
         /*
             Draw everything on the GameWindow under the menu
          */
-        panel = new JPanel() {
+        JPanel panel = new JPanel() {
             @Override
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
-                if(TESTING) {
+                if (TESTING) {
                     nonogram.paint(g2);
                 } else {
-                    if(editing) editableNonogram.paint(g2);
+                    if (editing) editableNonogram.paint(g2);
                     else nonogram.paint(g2);
                 }
             }
@@ -77,15 +76,11 @@ public class GameWindow extends JFrame {
                     }
                 }
                 frame.repaint();
-                clicking = true;
             }
-            public void mouseReleased(MouseEvent e) {
-                clicking = false;
-            }
+            public void mouseReleased(MouseEvent e) {}
             public void mouseEntered(MouseEvent e) {}
             public void mouseExited(MouseEvent e) {}
-            public void mouseClicked(MouseEvent e) {
-            }
+            public void mouseClicked(MouseEvent e) {}
         });
 
         getContentPane().addMouseMotionListener(new MouseMotionListener() {
@@ -137,7 +132,7 @@ public class GameWindow extends JFrame {
         check.setMnemonic(KeyEvent.VK_C);
         check.setAccelerator(KeyStroke.getKeyStroke('c'));
         check.addActionListener(e -> { if(!editing) {
-            nonogram.checkSolution();
+            System.out.println("The completed puzzle is valid: " + nonogram.checkSolution());
         } });
         fileMenu.add(check);
         fileMenu.addSeparator();
@@ -161,10 +156,14 @@ public class GameWindow extends JFrame {
         GraphicsDevice device = env.getScreenDevices()[0];
 
         GameWindow gameWindow = new GameWindow(device);
-        gameWindow.setSize(500, 500);
-        gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        gameWindow.setLocationRelativeTo(null);
-        gameWindow.setVisible(true);
-        // gameWindow.begin();
+
+
+        if(openInFullscreen) gameWindow.begin();
+        else {
+            gameWindow.setSize(500, 500);
+            gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            gameWindow.setLocationRelativeTo(null);
+            gameWindow.setVisible(true);
+        }
     }
 }
