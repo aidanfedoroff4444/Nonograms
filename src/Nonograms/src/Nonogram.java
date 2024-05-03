@@ -71,7 +71,7 @@ public class Nonogram extends Rectangle {
                 if(j == maxRowClues - 1) squareBorderWidths[1]++; // For the right edges of the row clues
 
                 if(i >= maxColClues && i % 5 == maxColClues) squareBorderWidths[0]++; // For each fifth row
-                if(j >= maxRowClues && j % 5 == maxRowClues) squareBorderWidths[3]++; // For each fifth collumn
+                if(j >= maxRowClues && j % 5 == maxRowClues) squareBorderWidths[3]++; // For each fifth column
 
                 puzzle[i][j].setBorders(squareBorderWidths);
 

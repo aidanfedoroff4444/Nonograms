@@ -15,7 +15,7 @@ public class GameWindow extends JFrame {
     private boolean editing = true;
     private int dragSymbol;
     private final boolean TESTING = true;
-    private static final boolean openInFullscreen = false;
+    private static final boolean openInFullscreen = true;
 
     public GameWindow(GraphicsDevice device) {
         super("Nonogram Editor", device.getDefaultConfiguration());
@@ -113,6 +113,18 @@ public class GameWindow extends JFrame {
         JMenu fileMenu = new JMenu("File"); // The first menu item "File"
         fileMenu.setMnemonic(KeyEvent.VK_F); // Set the keyboard key associated with choosing this option
         menuBar.add(fileMenu); // Add the menu to the menu bar
+
+        JMenuItem create = new JMenuItem("Create Puzzle");
+        create.setMnemonic(KeyEvent.VK_S);
+        create.setAccelerator(KeyStroke.getKeyStroke('c'));
+        create.addActionListener(e -> {
+            editing = true;
+            nonogram = new Nonogram(editableNonogram.getColumnClues(), editableNonogram.getRowClues());
+            System.out.println("rowClues: " + Arrays.deepToString(editableNonogram.getRowClues()) + "\ncolumnClues: " + Arrays.deepToString(editableNonogram.getColumnClues()));
+            repaint();
+        });
+        fileMenu.add(create);
+        fileMenu.addSeparator();
 
         JMenuItem start = new JMenuItem("Start Puzzle");
         start.setMnemonic(KeyEvent.VK_S);
