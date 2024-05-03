@@ -210,4 +210,58 @@ public class Nonogram extends Rectangle {
         }
         return true;
     }
+
+    public boolean attemptSolution() throws InterruptedException {
+        System.out.println("Original State:");
+        printPuzzleState();
+
+        // Create a 2d int array of the current state of the puzzle's Boxes
+        int[][] puzzleValues = new int[puzzleHeight][puzzleWidth];
+        for(int i = 0; i < puzzleHeight; i++) {
+            // Define a row
+            int[] row = new int[puzzleWidth];
+            for(int j = 0; j < puzzleWidth; j++)
+                row[j] = puzzle[i + maxColClues][j + maxRowClues].symbol;
+        }
+        // Start solving strategies:
+
+        //
+        /**
+         * Check for rows that have completed groups of 1's:
+         * 
+         */
+
+
+        return true;
+    }
+
+    public void printPuzzleState() {
+        // Print the column clues above the puzzle for the console
+        // System.out.println(Arrays.deepToString(columnClues));
+        for(int i = 0; i < maxRowClues + 5; i++) System.out.print(" ");
+        System.out.print("[");
+        for(int[] row : columnClues) {
+            StringBuilder out = new StringBuilder("");
+            for(int e : row) {
+                out.append(e);
+            }
+            if(row != columnClues[columnClues.length - 1]) out.append(", ");
+            else out.append("]\n");
+            System.out.print(out);
+        }
+
+        // Create a 2d int array of the current state of the puzzle's Boxes
+        int[][] puzzleValues = new int[puzzleHeight][puzzleWidth];
+        for(int i = 0; i < puzzleHeight; i++) {
+            // Print the row of the rowClues for the row of the puzzle
+            System.out.print(Arrays.toString(rowClues[i]) + " ");
+            // Define a row
+            int[] row = new int[puzzleWidth];
+            for(int j = 0; j < puzzleWidth; j++) {
+                row[j] = puzzle[i + maxColClues][j + maxRowClues].symbol;
+            }
+            // Print the row
+            System.out.println(Arrays.toString(row));
+        }
+    }
 }

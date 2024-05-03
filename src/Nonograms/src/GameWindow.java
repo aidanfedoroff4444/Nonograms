@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public class GameWindow extends JFrame {
     private final GraphicsDevice device;
-    private final EditableNonogram editableNonogram = new EditableNonogram();;
+    private final EditableNonogram editableNonogram = new EditableNonogram();
     private Nonogram nonogram;
     private boolean editing = true;
     private int dragSymbol;
@@ -137,7 +137,24 @@ public class GameWindow extends JFrame {
         fileMenu.add(check);
         fileMenu.addSeparator();
 
+        JMenuItem attemptSolution = new JMenuItem("Attempt Full Solution");
+        attemptSolution.setMnemonic(KeyEvent.VK_A);
+        attemptSolution.setAccelerator(KeyStroke.getKeyStroke('a'));
+        attemptSolution.addActionListener(e -> { if(!editing) {
+            System.out.println("Attempting Full Solution...");
+            boolean attemptSuccessful;
+            try {
+                attemptSuccessful = nonogram.attemptSolution();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            System.out.println("attemptSuccessful: " + attemptSuccessful);
+        } });
+        fileMenu.add(attemptSolution);
+        fileMenu.addSeparator();
+
         JMenuItem exitItem = new JMenuItem("Exit", KeyEvent.VK_ESCAPE);
+        exitItem.setMnemonic(KeyEvent.VK_E);
         exitItem.setAccelerator(KeyStroke.getKeyStroke((char) KeyEvent.VK_ESCAPE));
         exitItem.addActionListener(e -> System.exit(0));
         fileMenu.add(exitItem);
