@@ -10,12 +10,12 @@ import java.util.Arrays;
  */
 public class GameWindow extends JFrame {
     private final GraphicsDevice device;
-    private final EditableNonogram editableNonogram = new EditableNonogram();;
+    private final EditableNonogram editableNonogram = new EditableNonogram();
     private Nonogram nonogram;
     private boolean editing = true;
     private int dragSymbol;
     private final boolean TESTING = true;
-    private static final boolean openInFullscreen = false;
+    private static final boolean openInFullscreen = true;
 
     public GameWindow(GraphicsDevice device) {
         super("Nonogram Editor", device.getDefaultConfiguration());
@@ -114,6 +114,18 @@ public class GameWindow extends JFrame {
         fileMenu.setMnemonic(KeyEvent.VK_F); // Set the keyboard key associated with choosing this option
         menuBar.add(fileMenu); // Add the menu to the menu bar
 
+        JMenuItem create = new JMenuItem("Create Puzzle");
+        create.setMnemonic(KeyEvent.VK_S);
+        create.setAccelerator(KeyStroke.getKeyStroke('c'));
+        create.addActionListener(e -> {
+            editing = true;
+            nonogram = new Nonogram(editableNonogram.getColumnClues(), editableNonogram.getRowClues());
+            System.out.println("rowClues: " + Arrays.deepToString(editableNonogram.getRowClues()) + "\ncolumnClues: " + Arrays.deepToString(editableNonogram.getColumnClues()));
+            repaint();
+        });
+        fileMenu.add(create);
+        fileMenu.addSeparator();
+
         JMenuItem start = new JMenuItem("Start Puzzle");
         start.setMnemonic(KeyEvent.VK_S);
         start.setAccelerator(KeyStroke.getKeyStroke('s'));
@@ -137,7 +149,24 @@ public class GameWindow extends JFrame {
         fileMenu.add(check);
         fileMenu.addSeparator();
 
+        JMenuItem attemptSolution = new JMenuItem("Attempt Full Solution");
+        attemptSolution.setMnemonic(KeyEvent.VK_A);
+        attemptSolution.setAccelerator(KeyStroke.getKeyStroke('a'));
+        attemptSolution.addActionListener(e -> { if(!editing) {
+            System.out.println("Attempting Full Solution...");
+            boolean attemptSuccessful;
+            try {
+                attemptSuccessful = nonogram.attemptSolution();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            System.out.println("attemptSuccessful: " + attemptSuccessful);
+        } });
+        fileMenu.add(attemptSolution);
+        fileMenu.addSeparator();
+
         JMenuItem exitItem = new JMenuItem("Exit", KeyEvent.VK_ESCAPE);
+        exitItem.setMnemonic(KeyEvent.VK_E);
         exitItem.setAccelerator(KeyStroke.getKeyStroke((char) KeyEvent.VK_ESCAPE));
         exitItem.addActionListener(e -> System.exit(0));
         fileMenu.add(exitItem);
